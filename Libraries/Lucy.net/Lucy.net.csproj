@@ -5,16 +5,16 @@
         <Version>1.0.0-preview</Version>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
         <Description>Adds custom Lucy based entity recognizer to Bot Framework and Bot Composer.</Description>
-        <Company>Iciclecreek</Company>
+        <Company>Microsoft</Company>
         <Authors>Tom Laird-McConnell</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/tomlm/iciclecreek.bot/tree/master/source/Libraries/Lucy.net</PackageProjectUrl>
-        <PackageIconUrl>https://raw.githubusercontent.com/tomlm/iciclecreek.bot/master/Libraries/Lucy.net/icon.png</PackageIconUrl>
+        <PackageProjectUrl>https://github.com/tomlm/lucy</PackageProjectUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/tomlm/lucy/icon.png</PackageIconUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryType>git</RepositoryType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <RepositoryUrl>https://github.com/tomlm/iciclecreek.bot</RepositoryUrl>
-        <Copyright></Copyright>
+        <RepositoryUrl>https://github.com/tomlm/lucy</RepositoryUrl>
+        <Copyright>Microsoft 2020</Copyright>
         <ContentTargetFolders>content</ContentTargetFolders>
     </PropertyGroup>
 
