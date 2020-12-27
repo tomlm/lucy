@@ -1,5 +1,8 @@
 ![Lucy Logo](icon256.png)
 
+* [Documentation](help.md) 
+* [LucyPad2 Editor](https://lucypad2.azurewebsites.net)
+
 # Lucy Overview
 Lucy is an Entity Recognition engine which defines a simple yaml syntax for recognizing entities in text.
 
