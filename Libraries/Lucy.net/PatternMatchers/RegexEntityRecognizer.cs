@@ -12,9 +12,9 @@ namespace Lucy.PatternMatchers
     /// <summary>
     /// Will match any unclaimed tokens
     /// </summary>
-    public class RegexPatternMatcher
+    public class RegexEntityRecognizer
     {
-        public RegexPatternMatcher(string entityType, string pattern)
+        public RegexEntityRecognizer(string entityType, string pattern)
         {
             this.EntityType = entityType.TrimStart('@');
             this.Pattern = new Regex(pattern, RegexOptions.Compiled);

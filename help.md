@@ -268,3 +268,23 @@ an entity which is not defined in the .yaml file.
 ```yaml
 externalEntities: ['@foo','@bar']
 ```
+
+# Using the Library
+Add a reference to "lucy.net" nuget package.
+
+## With YAML
+
+```cs
+    var engine = new LucyEngine(yaml);
+    var results = engine.MatchEntities(text);
+```
+
+## With JSON
+
+Pass in a PatternConverter to allow patterns to be a string or a string array.
+
+```cs
+    var model= JsonConvert.DeserializeObject<LucyDocument>(json, new PatternConverter());
+    var engine = new LucyEngine(model);
+    var results = engine.MatchEntities(text);
+```

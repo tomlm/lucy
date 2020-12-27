@@ -2,10 +2,8 @@
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Microsoft.Recognizers.Text;
-using Newtonsoft.Json;
 
-namespace Lucy
+namespace Lucy.PatternMatchers
 {
     /// <summary>
     /// Entity Recognizer which recognizes quoted text as @QuotedText entity

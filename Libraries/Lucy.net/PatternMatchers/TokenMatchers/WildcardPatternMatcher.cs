@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using Lucy.PatternMatchers.Matchers;
-using Newtonsoft.Json.Linq;
 
 namespace Lucy.PatternMatchers
 {
     /// <summary>
-    /// Will match any unclaimed tokens
+    /// Will match any unclaimed tokens, to do this it looks ahead to NextPatternMatcher.
     /// </summary>
     public class WildcardPatternMatcher : PatternMatcher
     {

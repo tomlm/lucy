@@ -14,7 +14,7 @@ namespace Lucy.Tests
         [TestMethod]
         public void CreatesTextTokens()
         {
-            var engine = new LucyEngine(new LucyModel());
+            var engine = new LucyEngine(new LucyDocument());
 
             string text = "this is a test";
             var results = engine.MatchEntities(text, includeInternal: true);
@@ -31,16 +31,16 @@ namespace Lucy.Tests
         [TestMethod]
         public void TokenPatternMatcherTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
-                            new PatternModel("test")
+                            new Pattern("test")
                         }
                     }
                 }
@@ -59,16 +59,16 @@ namespace Lucy.Tests
         [TestMethod]
         public void TokenPatternMatcherTestsNoAt()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
-                            new PatternModel("test")
+                            new Pattern("test")
                         }
                     }
                 }
@@ -87,15 +87,15 @@ namespace Lucy.Tests
         [TestMethod]
         public void FuzzyTokenPatternMatcherTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
                         FuzzyMatch = true,
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "test"
                         }
@@ -116,14 +116,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_FuzzyModifierTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "(test)~"
                         }
@@ -144,14 +144,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_OneOfModifierTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (dog|cat|test)"
                         }
@@ -179,14 +179,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_OneOrMoreModifierTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (dog|cat|test)+"
                         }
@@ -207,14 +207,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_OneOrMoreModifierQuanittyTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (dog|cat|test)+1"
                         }
@@ -236,14 +236,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_ZeroOrMoreModifierTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (dog|cat|test)*"
                         }
@@ -272,14 +272,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_ZeroOrMoreModifierQuantityTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (dog|cat|test)3*"
                         }
@@ -300,14 +300,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_ZeroOrOneModifierTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (dog|cat|test)?"
                         }
@@ -337,14 +337,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void CanonicalValuesTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             new string[] { "LAX", "los angeles" },
                             new string[] { "DSM", "(des moines)~" },
@@ -374,16 +374,16 @@ namespace Lucy.Tests
         [TestMethod]
         public void CascadingPatternTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@boxsize",Patterns = new List<PatternModel>(){ "box is @twoDimensional" } },
-                    new EntityModel() { Name = "@height", Patterns = new List<PatternModel>() { "(@dimension|@number) (height|tall)" } },
-                    new EntityModel() { Name = "@width", Patterns = new List<PatternModel>() { "(@dimension|@number) (width|wide)" } },
-                    new EntityModel() {
+                    new EntityDefinition() { Name = "@boxsize",Patterns = new List<Pattern>(){ "box is @twoDimensional" } },
+                    new EntityDefinition() { Name = "@height", Patterns = new List<Pattern>() { "(@dimension|@number) (height|tall)" } },
+                    new EntityDefinition() { Name = "@width", Patterns = new List<Pattern>() { "(@dimension|@number) (width|wide)" } },
+                    new EntityDefinition() {
                         Name = "@twoDimensional",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "(@width|@dimension|@number) (x|by)? (@height|@dimension|@number)",
                             "(@height|@dimension|@number) (x|by)? (@width|@dimension|@number)",
@@ -408,11 +408,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void NestedPatternTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test",Patterns = new List<PatternModel>(){ "x ((p|d|q)|cool)" } },
+                    new EntityDefinition() { Name = "@test",Patterns = new List<Pattern>(){ "x ((p|d|q)|cool)" } },
                 }
             });
 
@@ -434,11 +434,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void NestedPatternOrdinalityTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test", Patterns = new List<PatternModel>(){ "(x y)+" } },
+                    new EntityDefinition() { Name = "@test", Patterns = new List<Pattern>(){ "(x y)+" } },
                 }
             });
 
@@ -458,11 +458,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void NestedPatternOrdinalityTests2()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test", Patterns = new List<PatternModel>(){ "((x) (y))+" } },
+                    new EntityDefinition() { Name = "@test", Patterns = new List<Pattern>(){ "((x) (y))+" } },
                 }
             });
 
@@ -483,11 +483,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void NestedPatternOrdinalityTests3()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test", Patterns = new List<PatternModel>(){ "((x)* (y)+)+" } },
+                    new EntityDefinition() { Name = "@test", Patterns = new List<Pattern>(){ "((x)* (y)+)+" } },
                 }
             });
 
@@ -519,21 +519,21 @@ namespace Lucy.Tests
         [TestMethod]
         public void MacroTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
                 Macros = new Dictionary<string, string>()
                 {
                     { "$test","(is|equals)" },
                 },
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name", Patterns = new List<PatternModel>() { "name $test ___" } },
-                    new EntityModel() { Name = "@boxsize",Patterns = new List<PatternModel>(){ "box $test @twoDimensional" } },
-                    new EntityModel() { Name = "@height", Patterns = new List<PatternModel>() { "(@dimension|@number) (height|tall)" } },
-                    new EntityModel() { Name = "@width", Patterns = new List<PatternModel>() { "(@dimension|@number) (width|wide)" } },
-                    new EntityModel() {
+                    new EntityDefinition() { Name = "@name", Patterns = new List<Pattern>() { "name $test ___" } },
+                    new EntityDefinition() { Name = "@boxsize",Patterns = new List<Pattern>(){ "box $test @twoDimensional" } },
+                    new EntityDefinition() { Name = "@height", Patterns = new List<Pattern>() { "(@dimension|@number) (height|tall)" } },
+                    new EntityDefinition() { Name = "@width", Patterns = new List<Pattern>() { "(@dimension|@number) (width|wide)" } },
+                    new EntityDefinition() {
                         Name = "@twoDimensional",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "(@width|@dimension|@number) (x|by)? (@height|@dimension|@number)",
                             "(@height|@dimension|@number) (x|by)? (@width|@dimension|@number)",
@@ -558,13 +558,13 @@ namespace Lucy.Tests
         [TestMethod]
         public void TokenPatternMatcherWithEntityTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test1", Patterns = new List<PatternModel>() { "test1" } },
-                    new EntityModel() { Name = "@test2", Patterns = new List<PatternModel>() { "test2" } },
-                    new EntityModel() { Name = "@test3", Patterns = new List<PatternModel>() {"@test1 @test2" } },
+                    new EntityDefinition() { Name = "@test1", Patterns = new List<Pattern>() { "test1" } },
+                    new EntityDefinition() { Name = "@test2", Patterns = new List<Pattern>() { "test2" } },
+                    new EntityDefinition() { Name = "@test3", Patterns = new List<Pattern>() {"@test1 @test2" } },
                 }
             });
 
@@ -581,12 +581,12 @@ namespace Lucy.Tests
         [TestMethod]
         public void PatternParser_MergeContigious()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@cold", Patterns = new List<PatternModel>(){ new string[] { "cold", "ice", "freezing", "frigid"} } },
-                    new EntityModel() { Name = "@test", Patterns = new List<PatternModel>(){ "I want (@cold)* beer" } }
+                    new EntityDefinition() { Name = "@cold", Patterns = new List<Pattern>(){ new string[] { "cold", "ice", "freezing", "frigid"} } },
+                    new EntityDefinition() { Name = "@test", Patterns = new List<Pattern>(){ "I want (@cold)* beer" } }
                 }
             });
 
@@ -604,11 +604,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void RegexPatternMatcher()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test", Patterns = new List<PatternModel>(){ "/N[\\dA-Z]{5}/" } }
+                    new EntityDefinition() { Name = "@test", Patterns = new List<Pattern>(){ "/N[\\dA-Z]{5}/" } }
                 }
             });
 
@@ -626,16 +626,16 @@ namespace Lucy.Tests
         [TestMethod]
         public void IgnoreTokenTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
                 Locale = "en",
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel()
+                    new EntityDefinition()
                     {
                         Name = "@test",
                         Ignore = new List<string>() { "is" },
-                        Patterns = new List<PatternModel>() { new PatternModel("name (value:___)") }
+                        Patterns = new List<Pattern>() { new Pattern("name (value:___)") }
                     }
                 }
             });

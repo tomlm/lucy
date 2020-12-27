@@ -6,7 +6,7 @@ using System.Text;
 namespace Lucy.PatternMatchers.Matchers
 {
     /// <summary>
-    /// Will match if htere is a @Token that matches.
+    /// Will match if htere is a Token that matches.
     /// </summary>
     public class TokenPatternMatcher : PatternMatcher
     {

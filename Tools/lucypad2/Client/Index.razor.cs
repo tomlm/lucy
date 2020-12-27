@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Blazorise;
 using BlazorMonacoYaml;
@@ -13,8 +12,6 @@ using Lucy;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using YamlDotNet.Core;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace LucyPad2.Client
 {
@@ -25,15 +22,6 @@ namespace LucyPad2.Client
         private string selectedExample;
 
         private LucyEngine engine = null;
-        private string lucyModel = null;
-        private PatternModelConverter patternModelConverter = new PatternModelConverter();
-
-        private IDeserializer yamlDeserializer = new DeserializerBuilder()
-                                                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                                                    .Build();
-        private ISerializer yamlToJsonSerializer = new SerializerBuilder()
-                                                .JsonCompatible()
-                                                .Build();
 
         public Index()
         {
@@ -166,11 +154,7 @@ namespace LucyPad2.Client
         private void LoadModel(string yaml)
         {
             // Trace.TraceInformation("Loading model");
-            var reader = new StringReader(yaml);
-            var x = yamlDeserializer.Deserialize(new StringReader(yaml));
-            var json = yamlToJsonSerializer.Serialize(x);
-            var model = JsonConvert.DeserializeObject<LucyModel>(json, patternModelConverter);
-            engine = new LucyEngine(model, useAllBuiltIns: true);
+            engine = new LucyEngine(yaml, useAllBuiltIns: true);
 
             // this.examplesBox.Text = sb.ToString();
 
@@ -184,7 +168,6 @@ namespace LucyPad2.Client
                 this.Error = string.Empty;
                 this.alertBox.Hide();
             }
-            lucyModel = yaml;
         }
     }
 }

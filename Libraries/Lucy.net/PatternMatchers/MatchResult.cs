@@ -5,6 +5,9 @@ using J2N.IO;
 
 namespace Lucy.PatternMatchers
 {
+    /// <summary>
+    /// Represents a match result while processing entities.
+    /// </summary>
     public class MatchResult
     {
         public MatchResult(bool matched, PatternMatcher matcher, TokenEntity nextToken = null, int start = 0, int end = 0)
@@ -22,14 +25,14 @@ namespace Lucy.PatternMatchers
         public bool Matched { get; set; }
 
         /// <summary>
-        /// End of recognized sequence.
-        /// </summary>
-        public int End { get; set; }
-
-        /// <summary>
         /// Start of recognized sequence
         /// </summary>
         public int Start { get; set; }
+
+        /// <summary>
+        /// End of recognized sequence.
+        /// </summary>
+        public int End { get; set; }
 
         /// <summary>
         /// Next token to process
@@ -42,7 +45,8 @@ namespace Lucy.PatternMatchers
         public PatternMatcher PatternMatcher { get; set; }
 
         /// <summary>
-        /// If there is a NextPattern and it was matched, this is the result of that operation.
+        /// If there is a NextPattern and it was matched, this is the result of that operation.  
+        /// To process wildcards we need to look ahead evaluate the nextPattern.
         /// </summary>
         public MatchResult NextPatternMatch { get; set; }
 

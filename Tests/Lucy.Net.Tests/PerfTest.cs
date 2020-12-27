@@ -13,22 +13,22 @@ namespace Lucy.Tests
         public void RunPerfTests()
         {
             StringBuilder sb = new StringBuilder();
-            var model = new LucyModel()
+            var model = new LucyDocument()
             {
                 Macros = new Dictionary<string, string>()
                 {
                     { "$name", "(name|nom de plum|handle)" },
                     { "$is", "(is|equals)?" }
                 },
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name", Patterns = new List<PatternModel>() { "$name $is ___" } },
-                    new EntityModel() { Name = "@boxsize",Patterns = new List<PatternModel>(){ "box $is @twoDimensions" } },
-                    new EntityModel() { Name = "@height", Patterns = new List<PatternModel>() { "(@dimension|@number) (height|tall)" } },
-                    new EntityModel() { Name = "@width", Patterns = new List<PatternModel>() { "(@dimension|@number) (width|wide)" } },
-                    new EntityModel() {
+                    new EntityDefinition() { Name = "@name", Patterns = new List<Pattern>() { "$name $is ___" } },
+                    new EntityDefinition() { Name = "@boxsize",Patterns = new List<Pattern>(){ "box $is @twoDimensions" } },
+                    new EntityDefinition() { Name = "@height", Patterns = new List<Pattern>() { "(@dimension|@number) (height|tall)" } },
+                    new EntityDefinition() { Name = "@width", Patterns = new List<Pattern>() { "(@dimension|@number) (width|wide)" } },
+                    new EntityDefinition() {
                         Name = "@twoDimensions",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "(@width|@dimension|@number) (x|by)? (@height|@dimension|@number)",
                             "(@height|@dimension|@number) (x|by)? (@width|@dimension|@number)",

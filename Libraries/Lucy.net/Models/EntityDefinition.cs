@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 namespace Lucy
 {
     /// <summary>
-    /// Represents a entityModels
+    /// Represents a entity definition
     /// </summary>
-    public class EntityModel
+    public class EntityDefinition
     {
-        public EntityModel()
+        public EntityDefinition()
         {
         }
 
@@ -42,7 +42,7 @@ namespace Lucy
 
         // patterns which define the entity
         [JsonProperty("patterns")]
-        public List<PatternModel> Patterns { get; set; }  = new List<PatternModel>();
+        public List<Pattern> Patterns { get; set; }  = new List<Pattern>();
 
         /// <summary>
         /// Ignore tokens.

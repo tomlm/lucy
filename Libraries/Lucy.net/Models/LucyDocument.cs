@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 
 namespace Lucy
 {
-    public class LucyModel
+    public class LucyDocument
     {
-        public LucyModel()
+        public LucyDocument()
         { }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Lucy
         /// Entity definitions
         /// </summary>
         [JsonProperty("entities")]
-        public List<EntityModel> Entities { get; set; } = new List<EntityModel>();
+        public List<EntityDefinition> Entities { get; set; } = new List<EntityDefinition>();
 
         /// <summary>
         /// Macros

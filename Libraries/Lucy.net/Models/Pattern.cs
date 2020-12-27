@@ -10,20 +10,20 @@ namespace Lucy
     /// <summary>
     /// Represents a pattern which is a string, or array of strings
     /// </summary>
-    public class PatternModel : IEnumerable<string>
+    public class Pattern : IEnumerable<string>
     {
         private List<string> patterns = new List<string>();
 
-        public PatternModel()
+        public Pattern()
         {
         }
 
-        public PatternModel(string patternDefinition)
+        public Pattern(string patternDefinition)
         {
             this.patterns.Add(patternDefinition.Trim());
         }
 
-        public PatternModel(string[] patternDefinitions)
+        public Pattern(string[] patternDefinitions)
         {
             if (patternDefinitions!= null && patternDefinitions.Any())
             {
@@ -34,11 +34,11 @@ namespace Lucy
         public IEnumerator<string> GetEnumerator() => this.patterns.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.patterns).GetEnumerator();
 
-        public static implicit operator PatternModel(string patternDefinition) => new PatternModel(patternDefinition);
-        public static implicit operator PatternModel(JValue patternDefinition) => new PatternModel((string)patternDefinition);
+        public static implicit operator Pattern(string patternDefinition) => new Pattern(patternDefinition);
+        public static implicit operator Pattern(JValue patternDefinition) => new Pattern((string)patternDefinition);
 
-        public static implicit operator PatternModel(string[] patternDefinitions) => new PatternModel(patternDefinitions);
-        public static implicit operator PatternModel(JArray patternDefinitions) => new PatternModel(patternDefinitions.ToObject<string[]>());
+        public static implicit operator Pattern(string[] patternDefinitions) => new Pattern(patternDefinitions);
+        public static implicit operator Pattern(JArray patternDefinitions) => new Pattern(patternDefinitions.ToObject<string[]>());
 
         public override string ToString() => $"[{this.patterns.FirstOrDefault()}, ...]";
     }

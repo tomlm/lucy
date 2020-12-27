@@ -14,11 +14,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void FallbackParserTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name", Patterns = new List<PatternModel>(){"name is (value:___)+"} },
+                    new EntityDefinition() { Name = "@name", Patterns = new List<Pattern>(){"name is (value:___)+"} },
                 }
             });
 
@@ -37,11 +37,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardSingleTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name",Patterns = new List<PatternModel>(){"name is (value:___)"} },
+                    new EntityDefinition() { Name = "@name",Patterns = new List<Pattern>(){"name is (value:___)"} },
                 }
             });
 
@@ -59,11 +59,11 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardSinglePrefixTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@beer", Patterns = new List<PatternModel>(){"(value:___) beer"} },
+                    new EntityDefinition() { Name = "@beer", Patterns = new List<Pattern>(){"(value:___) beer"} },
                 }
             });
 
@@ -81,12 +81,12 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardSingleMultiPrefixTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@desire", Patterns = new List<PatternModel>(){"like"} },
-                    new EntityModel() { Name = "@beer", Patterns = new List<PatternModel>(){"(value:___)+2 beer"} },
+                    new EntityDefinition() { Name = "@desire", Patterns = new List<Pattern>(){"like"} },
+                    new EntityDefinition() { Name = "@beer", Patterns = new List<Pattern>(){"(value:___)+2 beer"} },
                 }
             });
 
@@ -104,12 +104,12 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardDoubleInlineTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name",Patterns = new List<PatternModel>(){"name is (value:___) (value:___)"} },
-                    new EntityModel() { Name = "@entity",Patterns = new List<PatternModel>(){"end"} },
+                    new EntityDefinition() { Name = "@name",Patterns = new List<Pattern>(){"name is (value:___) (value:___)"} },
+                    new EntityDefinition() { Name = "@entity",Patterns = new List<Pattern>(){"end"} },
                 }
             });
 
@@ -139,12 +139,12 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardDoubleInlineOrdinalTest()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name",Patterns = new List<PatternModel>(){"name is (value:___)+"} },
-                    new EntityModel() { Name = "@entity",Patterns = new List<PatternModel>(){"end"} },
+                    new EntityDefinition() { Name = "@name",Patterns = new List<Pattern>(){"name is (value:___)+"} },
+                    new EntityDefinition() { Name = "@entity",Patterns = new List<Pattern>(){"end"} },
                 }
             });
 
@@ -174,12 +174,12 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardPatternTest_StopsOnAnyEntity()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@name",Patterns = new List<PatternModel>(){"name is (value:___)+"} },
-                    new EntityModel() { Name = "@conjunction",Patterns = new List<PatternModel>(){"(and|or)"} },
+                    new EntityDefinition() { Name = "@name",Patterns = new List<Pattern>(){"name is (value:___)+"} },
+                    new EntityDefinition() { Name = "@conjunction",Patterns = new List<Pattern>(){"(and|or)"} },
                 }
             });
 
@@ -197,18 +197,18 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardOrdinalTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
                 Macros = new Dictionary<string, string>()
                 {
                     { "$is","(is|equals)" },
                 },
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@size", Patterns = new List<PatternModel>() { "(small|medium|large)" } },
-                    new EntityModel() {
+                    new EntityDefinition() { Name = "@size", Patterns = new List<Pattern>() { "(small|medium|large)" } },
+                    new EntityDefinition() {
                         Name = "@drink",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (@size)? (value:___)* (drink|cocktail|beverage)?"
                         }
@@ -230,18 +230,18 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardNamedTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
                 Macros = new Dictionary<string, string>()
                 {
                     { "$is","(is|equals)" },
                 },
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@size", Patterns = new List<PatternModel>() { "small" } },
-                    new EntityModel() {
+                    new EntityDefinition() { Name = "@size", Patterns = new List<Pattern>() { "small" } },
+                    new EntityDefinition() {
                         Name = "@drink",
-                        Patterns = new List<PatternModel>()
+                        Patterns = new List<Pattern>()
                         {
                             "a (@size)? (label:___)* cocktail"
                         }
@@ -263,13 +263,13 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardMatcherWithEntityTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test1", Patterns = new List<PatternModel>() { "test1" } },
-                    new EntityModel() { Name = "@test2", Patterns = new List<PatternModel>() { "test2" } },
-                    new EntityModel() { Name = "@test3", Patterns = new List<PatternModel>() {"start (@test1|@test2|label:___)* end" } },
+                    new EntityDefinition() { Name = "@test1", Patterns = new List<Pattern>() { "test1" } },
+                    new EntityDefinition() { Name = "@test2", Patterns = new List<Pattern>() { "test2" } },
+                    new EntityDefinition() { Name = "@test3", Patterns = new List<Pattern>() {"start (@test1|@test2|label:___)* end" } },
                 }
             });
 
@@ -285,13 +285,13 @@ namespace Lucy.Tests
         [TestMethod]
         public void WildcardMatcherWithOptionalTokenTests()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@test1", Patterns = new List<PatternModel>() { "test1" } },
-                    new EntityModel() { Name = "@test2", Patterns = new List<PatternModel>() { "test2" } },
-                    new EntityModel() { Name = "@test3", Patterns = new List<PatternModel>() { "start (@test1|@test2|label:___)* end (label:___)* " } },
+                    new EntityDefinition() { Name = "@test1", Patterns = new List<Pattern>() { "test1" } },
+                    new EntityDefinition() { Name = "@test2", Patterns = new List<Pattern>() { "test2" } },
+                    new EntityDefinition() { Name = "@test3", Patterns = new List<Pattern>() { "start (@test1|@test2|label:___)* end (label:___)* " } },
                 }
             });
 

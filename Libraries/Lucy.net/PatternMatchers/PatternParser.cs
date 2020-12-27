@@ -9,6 +9,9 @@ using Lucy.PatternMatchers.Matchers;
 
 namespace Lucy.PatternMatchers
 {
+    /// <summary>
+    /// Class which parses a string like "(x|y|z)?" into appropraite PatternMatcher for evaluation.
+    /// </summary>
     public class PatternParser
     {
         private Analyzer exactAnalyzer;

@@ -6,7 +6,7 @@ using System.Text;
 namespace Lucy.PatternMatchers
 {
     /// <summary>
-    /// Matches ZeroOrMore (token)* ordinality
+    /// Matches (token)* ordinality
     /// </summary>
     public class OrdinalityPatternMatcher : PatternMatcher
     {

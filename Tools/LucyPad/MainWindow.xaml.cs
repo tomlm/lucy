@@ -22,7 +22,7 @@ namespace LucyPad
     {
         private LucyEngine engine = null;
         private string lucyModel = null;
-        private JsonConverter patternModelConverter = new PatternModelConverter();
+        private JsonConverter patternModelConverter = new PatternConverter();
 
         private IDeserializer yamlDeserializer = new DeserializerBuilder()
                                                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -102,7 +102,7 @@ namespace LucyPad
             // Trace.TraceInformation("Loading model");
             var x = yamlDeserializer.Deserialize(new StringReader(this.editor.Document.Text));
             var json = yamlToJsonSerializer.Serialize(x);
-            var model = JsonConvert.DeserializeObject<LucyModel>(json, patternModelConverter);
+            var model = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
             engine = new LucyEngine(model, useAllBuiltIns: true);
             //recognizer = new LucyRecognizer()
             //{

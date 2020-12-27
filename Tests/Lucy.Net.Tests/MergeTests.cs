@@ -14,14 +14,14 @@ namespace Lucy.Tests
         [TestMethod]
         public void MergeNestedChildren()
         {
-            var engine = new LucyEngine(new LucyModel()
+            var engine = new LucyEngine(new LucyDocument()
             {
-                Entities = new List<EntityModel>()
+                Entities = new List<EntityDefinition>()
                 {
-                    new EntityModel() { Name = "@PizzaOrder", Patterns = new List<PatternModel>(){ "(@Topping)* (@AddToppings)* " } },
-                    new EntityModel() { Name = "@AddToppings", Patterns = new List<PatternModel>(){ "(@ToppingQuantifier)* (@Topping)+" } },
-                    new EntityModel() { Name = "@ToppingQuantifier", Patterns = new List<PatternModel>(){ "extra" } },
-                    new EntityModel() { Name = "@Topping", Patterns = new List<PatternModel>(){ "Cheese" } },
+                    new EntityDefinition() { Name = "@PizzaOrder", Patterns = new List<Pattern>(){ "(@Topping)* (@AddToppings)* " } },
+                    new EntityDefinition() { Name = "@AddToppings", Patterns = new List<Pattern>(){ "(@ToppingQuantifier)* (@Topping)+" } },
+                    new EntityDefinition() { Name = "@ToppingQuantifier", Patterns = new List<Pattern>(){ "extra" } },
+                    new EntityDefinition() { Name = "@Topping", Patterns = new List<Pattern>(){ "Cheese" } },
                 }
             });
 

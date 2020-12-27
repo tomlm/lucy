@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Lucene.Net.Analysis.CharFilters;
-using Lucy;
-using Lucy.PatternMatchers;
-using Lucy.PatternMatchers.Matchers;
 using Newtonsoft.Json.Linq;
 
 namespace Lucy
 {
     /// <summary>
-    /// Data structure used to track entities that have been computed over the text.
+    /// MatchContext is used to track entities that have been computed over the text.
     /// </summary>
     public class MatchContext
     {
@@ -67,6 +61,10 @@ namespace Lucy
             NewEntities.Clear();
         }
 
+        /// <summary>
+        /// Add entity as a child to current entity.
+        /// </summary>
+        /// <param name="entity"></param>
         public void AddToCurrentEntity(LucyEntity entity)
         {
             var token = this.GetFirstTokenEntity(entity.Start);
@@ -79,7 +77,7 @@ namespace Lucy
                     var existingEntity = CurrentEntity.Children.Where(e => e.Type == entity.Type && e.End == prevToken.End).SingleOrDefault();
                     if (existingEntity != null && JToken.FromObject(entity.Resolution ?? "").ToString() == JToken.FromObject(existingEntity.Resolution ?? "").ToString())
                     {
-                        var mergedEntity = MergeEntities(entity, existingEntity);
+                        var mergedEntity = Merge(entity, existingEntity);
                         CurrentEntity.Children.Remove(existingEntity);
                         CurrentEntity.Children.Add(mergedEntity);
                         return;
@@ -95,6 +93,11 @@ namespace Lucy
             CurrentEntity.Score = CurrentEntity.GetAllEntities().Count() + ((float)(CurrentEntity.End - CurrentEntity.Start) / this.Text.Length);
         }
 
+        /// <summary>
+        /// Has this token been matched by an entity pattern?
+        /// </summary>
+        /// <param name="tokenEntity"></param>
+        /// <returns></returns>
         public bool IsTokenMatched(LucyEntity tokenEntity)
         {
             return this.Entities.Any(e => e.Start == tokenEntity.Start);
@@ -125,6 +128,11 @@ namespace Lucy
             return this.TokenEntities.LastOrDefault(tokenEntity => !this.EntityPattern.Ignore.Contains(tokenEntity.Text));
         }
 
+        /// <summary>
+        /// Get the next token entity, honoring ignore in the context.
+        /// </summary>
+        /// <param name="tokenEntity"></param>
+        /// <returns></returns>
         public TokenEntity GetNextTokenEntity(TokenEntity tokenEntity)
         {
             var result = tokenEntity.Next;
@@ -135,6 +143,9 @@ namespace Lucy
             return result;
         }
 
+        /// <summary>
+        /// Get the prev token entity, honoring ignore in the context.
+        /// </summary>
         public TokenEntity GetPrevTokenEntity(TokenEntity tokenEntity)
         {
             var result = tokenEntity?.Previous;
@@ -186,7 +197,7 @@ namespace Lucy
                                                 // merge them
                                                 removeEntities.Add(entity);
                                                 removeEntities.Add(alternateEntity);
-                                                newEntities.Add(MergeEntities(entity, alternateEntity));
+                                                newEntities.Add(Merge(entity, alternateEntity));
                                             }
 
                                             // if offset overlapping at start or end
@@ -196,7 +207,7 @@ namespace Lucy
                                                 // merge them
                                                 removeEntities.Add(entity);
                                                 removeEntities.Add(alternateEntity);
-                                                newEntities.Add(MergeEntities(entity, alternateEntity));
+                                                newEntities.Add(Merge(entity, alternateEntity));
                                             }
                                             else if (entity.Resolution?.ToString() == alternateEntity.Resolution?.ToString())
                                             {
@@ -207,7 +218,7 @@ namespace Lucy
                                                 {
                                                     removeEntities.Add(entity);
                                                     removeEntities.Add(alternateEntity);
-                                                    newEntities.Add(MergeEntities(entity, alternateEntity));
+                                                    newEntities.Add(Merge(entity, alternateEntity));
                                                 }
                                             }
                                             else
@@ -295,7 +306,7 @@ namespace Lucy
         }
 
 
-        private LucyEntity MergeEntities(LucyEntity entity, LucyEntity alternateEntity)
+        private LucyEntity Merge(LucyEntity entity, LucyEntity alternateEntity)
         {
             var mergedEntity = new LucyEntity()
             {

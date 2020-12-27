@@ -18,7 +18,7 @@ namespace LucyPad2.Server.Controllers
     [Route("[controller]")]
     public class EntitiesController : ControllerBase
     {
-        private JsonConverter patternModelConverter = new PatternModelConverter();
+        private JsonConverter patternModelConverter = new PatternConverter();
 
         private IDeserializer yamlDeserializer = new DeserializerBuilder()
                                                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -46,7 +46,7 @@ namespace LucyPad2.Server.Controllers
 
                     var x = yamlDeserializer.Deserialize(new StringReader(request.yaml));
                     var json = yamlToJsonSerializer.Serialize(x);
-                    var model = JsonConvert.DeserializeObject<LucyModel>(json, patternModelConverter);
+                    var model = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
                     engine = new LucyEngine(model, useAllBuiltIns: true);
                     _cache.Set(request.yaml, engine);
                 }

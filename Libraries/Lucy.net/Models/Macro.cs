@@ -10,9 +10,9 @@ namespace Lucy
     /// <summary>
     /// Represents a Value
     /// </summary>
-    public class MacrosModel
+    public class Macro
     {
-        public MacrosModel()
+        public Macro()
         {
         }
 

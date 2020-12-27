@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using Lucy.PatternMatchers;
 using Lucy.PatternMatchers.Matchers;
 using Lucene.Net.Analysis;
@@ -33,7 +31,6 @@ using Lucene.Net.Analysis.Lv;
 using Lucene.Net.Analysis.Nl;
 using Lucene.Net.Analysis.No;
 using Lucene.Net.Analysis.Phonetic;
-using Lucene.Net.Analysis.Phonetic.Language.Bm;
 using Lucene.Net.Analysis.Pt;
 using Lucene.Net.Analysis.Ro;
 using Lucene.Net.Analysis.Ru;
@@ -43,11 +40,10 @@ using Lucene.Net.Analysis.TokenAttributes;
 using Lucene.Net.Analysis.Tr;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Util;
-using Newtonsoft.Json.Linq;
 using builtin = Microsoft.Recognizers.Text;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Microsoft.Recognizers.Text.Number.Chinese;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using Newtonsoft.Json;
 
 namespace Lucy
 {
@@ -56,8 +52,16 @@ namespace Lucy
     /// </summary>
     public class LucyEngine
     {
-        private Random _rnd = new Random();
-        private LucyModel _lucyModel;
+        private static PatternConverter patternModelConverter = new PatternConverter();
+        private static IDeserializer yamlDeserializer = new DeserializerBuilder()
+                                                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                                                    .Build();
+        private static ISerializer yamlToJsonSerializer = new SerializerBuilder()
+                                                .JsonCompatible()
+                                                .Build();
+        private static Random _rnd = new Random();
+
+        private LucyDocument _lucyModel;
         private Analyzer _simpleAnalyzer = new SimpleAnalyzer(LuceneVersion.LUCENE_48);
         private Analyzer _exactAnalyzer;
         private Analyzer _fuzzyAnalyzer;
@@ -71,38 +75,18 @@ namespace Lucy
             "quotedtext", "integer", "fraction", "decimal"
         };
 
-        public LucyEngine(LucyModel model, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
+        public LucyEngine(string yaml, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
         {
-            this._lucyModel = model;
+            var x = yamlDeserializer.Deserialize(new StringReader(yaml));
+            var json = yamlToJsonSerializer.Serialize(x);
+            var model = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
 
-            this._exactAnalyzer = exactAnalyzer ?? GetAnalyzerForLocale(model.Locale);
+            LoadModel(model, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
+        }
 
-            this._fuzzyAnalyzer = exactAnalyzer ?? fuzzyAnalyzer ??
-                Analyzer.NewAnonymous((field, textReader) =>
-                {
-                    Tokenizer tokenizer = new StandardTokenizer(LuceneVersion.LUCENE_48, textReader);
-                    TokenStream stream = new DoubleMetaphoneFilter(tokenizer, 6, false);
-                    //TokenStream stream = new BeiderMorseFilterFactory(new Dictionary<string, string>()
-                    //    {
-                    //        { "nameType", NameType.GENERIC.ToString()},
-                    //        { "ruleType", RuleType.APPROX.ToString() },
-                    //        { "languageSet", "auto"}
-                    //    }).Create(tokenizer);
-                    return new TokenStreamComponents(tokenizer, stream);
-                });
-
-            this._patternParser = new PatternParser(this._exactAnalyzer, this._fuzzyAnalyzer); ;
-
-            LoadModel();
-
-            if (useAllBuiltIns)
-            {
-                BuiltinEntities = new HashSet<string>(builtinEntities);
-                // add default pattern for datetime = (all permutations of datetime)
-                EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
-            }
-
-            ValidateModel();
+        public LucyEngine(LucyDocument model, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
+        {
+            LoadModel(model, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
         }
 
         /// <summary>
@@ -125,7 +109,7 @@ namespace Lucy
         /// <summary>
         /// Regex patterns to match
         /// </summary>
-        public List<RegexPatternMatcher> RegexEntityPatterns { get; set; } = new List<RegexPatternMatcher>();
+        public List<RegexEntityRecognizer> RegexEntityPatterns { get; set; } = new List<RegexEntityRecognizer>();
 
         /// <summary>
         /// Warning messages
@@ -506,8 +490,28 @@ namespace Lucy
             }
         }
 
-        private void LoadModel()
+        private void LoadModel(LucyDocument model, Analyzer exactAnalyzer, Analyzer fuzzyAnalyzer, Boolean useAllBuiltIns)
         {
+            this._lucyModel = model;
+
+            this._exactAnalyzer = exactAnalyzer ?? GetAnalyzerForLocale(model.Locale);
+
+            this._fuzzyAnalyzer = exactAnalyzer ?? fuzzyAnalyzer ??
+                Analyzer.NewAnonymous((field, textReader) =>
+                {
+                    Tokenizer tokenizer = new StandardTokenizer(LuceneVersion.LUCENE_48, textReader);
+                    TokenStream stream = new DoubleMetaphoneFilter(tokenizer, 6, false);
+                    //TokenStream stream = new BeiderMorseFilterFactory(new Dictionary<string, string>()
+                    //    {
+                    //        { "nameType", NameType.GENERIC.ToString()},
+                    //        { "ruleType", RuleType.APPROX.ToString() },
+                    //        { "languageSet", "auto"}
+                    //    }).Create(tokenizer);
+                    return new TokenStreamComponents(tokenizer, stream);
+                });
+
+            this._patternParser = new PatternParser(this._exactAnalyzer, this._fuzzyAnalyzer); ;
+
             if (_lucyModel.Macros == null)
             {
                 _lucyModel.Macros = new Dictionary<string, string>();
@@ -528,7 +532,7 @@ namespace Lucy
                             {
                                 if (pattern.StartsWith('/') && pattern.EndsWith('/'))
                                 {
-                                    RegexEntityPatterns.Add(new RegexPatternMatcher(entityModel.Name, pattern.Trim('/')));
+                                    RegexEntityPatterns.Add(new RegexEntityRecognizer(entityModel.Name, pattern.Trim('/')));
                                 }
                                 else
                                 {
@@ -575,6 +579,15 @@ namespace Lucy
                     }
                 }
             }
+
+            if (useAllBuiltIns)
+            {
+                BuiltinEntities = new HashSet<string>(builtinEntities);
+                // add default pattern for datetime = (all permutations of datetime)
+                EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
+            }
+
+            ValidateModel();
         }
 
         private void ValidateModel()
