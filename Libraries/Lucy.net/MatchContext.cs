@@ -289,11 +289,11 @@ namespace Lucy
                             }
                             else if ((entity.End - entity.Start) > (alternateEntity.End - alternateEntity.Start))
                             {
-                                entities.Remove(entity);
+                                entities.Remove(alternateEntity);
                             }
                             else if ((entity.End - entity.Start) < (alternateEntity.End - alternateEntity.Start))
                             {
-                                entities.Remove(alternateEntity);
+                                entities.Remove(entity);
                             }
                             else
                             {
