@@ -29,26 +29,22 @@ namespace Lucy
         public bool FuzzyMatch { get; set; } = false;
 
         /// <summary>
-        /// The entities to use to make this entity.
-        /// </summary>
-        [JsonProperty("entities")]
-        public List<string> Entities{ get; set; } = new List<string>();
-
-        /// <summary>
         /// Example utterances for this entity.
         /// </summary>
         [JsonProperty("examples")]
         public List<string> Examples { get; set; } = new List<string>();
-
-        // patterns which define the entity
-        [JsonProperty("patterns")]
-        public List<Pattern> Patterns { get; set; }  = new List<Pattern>();
 
         /// <summary>
         /// Ignore tokens.
         /// </summary>
         [JsonProperty("ignore")]
         public List<string> Ignore{ get; set; } = new List<string>();
+
+        /// <summary>
+        /// patterns which define the entity
+        /// </summary>
+        [JsonProperty("patterns")]
+        public List<Pattern> Patterns { get; set; }  = new List<Pattern>();
 
         public override string ToString() => $"{Name}{(FuzzyMatch ? "~" : "")}";
     }

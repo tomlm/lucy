@@ -75,22 +75,40 @@ namespace Lucy
             "quotedtext", "integer", "fraction", "decimal"
         };
 
-        public LucyEngine(string yaml, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
+        /// <summary>
+        /// Create instance of Lucy Engine
+        /// </summary>
+        /// <param name="yamlOrJson">YAML or JSON of a lucy document.</param>
+        /// <param name="exactAnalyzer">Optional analyzer override to use for token matching.</param>
+        /// <param name="fuzzyAnalyzer">Optional analyzer override to use for fuzzy token matching.</param>
+        /// <param name="useAllBuiltIns">Enable all built ins (default is to only enable built ins that are referred to). This argument is only useful for design time.</param>
+        public LucyEngine(string yamlOrJson, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
         {
-            var x = yamlDeserializer.Deserialize(new StringReader(yaml));
-            var json = yamlToJsonSerializer.Serialize(x);
-            var model = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
+            string json = null;
+            if (!yamlOrJson.TrimStart().StartsWith("{"))
+            {
+                var x = yamlDeserializer.Deserialize(new StringReader(yamlOrJson));
+                json = yamlToJsonSerializer.Serialize(x);
+            }
 
-            LoadModel(model, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
-        }
-
-        public LucyEngine(LucyDocument model, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
-        {
-            LoadModel(model, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
+            LucyDocument document = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
+            LoadDocument(document, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
         }
 
         /// <summary>
-        /// The locale for this model
+        /// Create instance of Lucy Engine
+        /// </summary>
+        /// <param name="document">a lucy document.</param>
+        /// <param name="exactAnalyzer">Optional analyzer override to use for token matching.</param>
+        /// <param name="fuzzyAnalyzer">Optional analyzer override to use for fuzzy token matching.</param>
+        /// <param name="useAllBuiltIns">Enable all built ins (default is to only enable built ins that are referred to). This argument is only useful for design time.</param>
+        public LucyEngine(LucyDocument document, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
+        {
+            LoadDocument(document, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
+        }
+
+        /// <summary>
+        /// The locale for this model (default:en)
         /// </summary>
         public string Locale { get; set; } = "en";
 
@@ -490,7 +508,7 @@ namespace Lucy
             }
         }
 
-        private void LoadModel(LucyDocument model, Analyzer exactAnalyzer, Analyzer fuzzyAnalyzer, Boolean useAllBuiltIns)
+        private void LoadDocument(LucyDocument model, Analyzer exactAnalyzer, Analyzer fuzzyAnalyzer, Boolean useAllBuiltIns)
         {
             this._lucyModel = model;
 
