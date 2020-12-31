@@ -16,6 +16,7 @@
             <SelectItem Value="@("email")">Email</SelectItem>
             <SelectItem Value="@("pizza")">Pizza</SelectItem>
         </Select>
+        <Switch TValue="bool" Checked="@ShowJson" CheckedChanged="@OnJsonSwitch">As JSON</Switch>
     </Text>
 
     <MonacoEditorYaml @ref="yamlEditor" Id="monacoEditorYaml" Value="@Yaml" CssClass="grid-yaml" />

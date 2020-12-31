@@ -13,8 +13,6 @@ namespace Lucy.Tests
     [TestClass]
     public class SerializationTests
     {
-        private JsonConverter patternModelConverter = new PatternConverter();
-
         private IDeserializer yamlDeserializer = new DeserializerBuilder()
                                                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                                                     .Build();
@@ -28,9 +26,7 @@ namespace Lucy.Tests
             LucyDocument lucyModel;
             using (var streamReader = new StreamReader(File.OpenRead(Path.Combine(@"..", "..", "..", "lucy.yaml"))))
             {
-                var x = yamlDeserializer.Deserialize(streamReader);
-                var json = yamlSerializer.Serialize(x);
-                lucyModel = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
+                lucyModel = yamlDeserializer.Deserialize<LucyDocument>(streamReader);
             }
 
             var engine = new LucyEngine(lucyModel);
@@ -55,9 +51,7 @@ namespace Lucy.Tests
             LucyDocument lucyModel;
             using (var streamReader = new StreamReader(File.OpenRead(Path.Combine(@"..", "..", "..", "lucy.yaml"))))
             {
-                var x = yamlDeserializer.Deserialize(streamReader);
-                var json = yamlSerializer.Serialize(x);
-                lucyModel = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
+                lucyModel = yamlDeserializer.Deserialize<LucyDocument>(streamReader);
             }
 
             var engine = new LucyEngine(lucyModel);

@@ -44,6 +44,7 @@ using builtin = Microsoft.Recognizers.Text;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Newtonsoft.Json;
+using YamlDotNet.RepresentationModel;
 
 namespace Lucy
 {
@@ -52,7 +53,6 @@ namespace Lucy
     /// </summary>
     public class LucyEngine
     {
-        private static PatternConverter patternModelConverter = new PatternConverter();
         private static IDeserializer yamlDeserializer = new DeserializerBuilder()
                                                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
                                                     .Build();
@@ -84,14 +84,15 @@ namespace Lucy
         /// <param name="useAllBuiltIns">Enable all built ins (default is to only enable built ins that are referred to). This argument is only useful for design time.</param>
         public LucyEngine(string yamlOrJson, Analyzer exactAnalyzer = null, Analyzer fuzzyAnalyzer = null, bool useAllBuiltIns = false)
         {
-            string json = null;
+            LucyDocument document = null;
             if (!yamlOrJson.TrimStart().StartsWith("{"))
             {
-                var x = yamlDeserializer.Deserialize(new StringReader(yamlOrJson));
-                json = yamlToJsonSerializer.Serialize(x);
+                document = yamlDeserializer.Deserialize<LucyDocument>(new StringReader(yamlOrJson));
             }
-
-            LucyDocument document = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
+            else
+            {
+                document = JsonConvert.DeserializeObject<LucyDocument>(yamlOrJson);
+            }
             LoadDocument(document, exactAnalyzer, fuzzyAnalyzer, useAllBuiltIns);
         }
 
@@ -557,7 +558,7 @@ namespace Lucy
                                     var patternMatcher = _patternParser.Parse(pattern, entityModel.FuzzyMatch);
                                     if (patternMatcher != null)
                                     {
-                                        var ignoreWords = entityModel.Ignore.Select(ignoreText => ((TokenResolution)Tokenize(ignoreText).First().Resolution).Token);
+                                        var ignoreWords = entityModel.Ignore?.Select(ignoreText => ((TokenResolution)Tokenize(ignoreText).First().Resolution).Token) ?? Array.Empty<string>();
 
                                         // Trace.TraceInformation($"{expandedPattern} => {patternMatcher}");
                                         if (patternMatcher.ContainsWildcard())
@@ -616,10 +617,13 @@ namespace Lucy
                 "datetimeV2.daterange", "datetimeV2.timerange", "datetimeV2.datetimerange",
                 "datetimeV2.duration", "ordinal.relative", "wildcard"
             };
-
-            foreach (var externlEntity in this._lucyModel.ExternalEntities)
+            
+            if (this._lucyModel.ExternalEntities != null)
             {
-                entityDefinitions.Add(externlEntity);
+                foreach (var externlEntity in this._lucyModel.ExternalEntities)
+                {
+                    entityDefinitions.Add(externlEntity);
+                }
             }
 
             HashSet<string> entityReferences = new HashSet<string>();

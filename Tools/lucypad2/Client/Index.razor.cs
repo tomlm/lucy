@@ -11,12 +11,22 @@ using BlazorMonacoYaml;
 using Lucy;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using YamlDotNet.Core;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace LucyPad2.Client
 {
     public partial class Index
     {
+        private IDeserializer yamlDeserializer = new DeserializerBuilder()
+                                                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                                                    .Build();
+        private ISerializer yamlToJsonSerializer = new SerializerBuilder()
+                                                .JsonCompatible()
+                                                .Build();
+
         private MonacoEditorYaml yamlEditor;
         private Alert alertBox;
         private string selectedExample;
@@ -29,6 +39,8 @@ namespace LucyPad2.Client
 
         [Inject]
         public HttpClient Http { get; set; }
+
+        public bool ShowJson = false;
 
         public bool TopResultVisible = true;
 
@@ -54,9 +66,65 @@ namespace LucyPad2.Client
 
         async Task OnSelectedExampleChanged(string value)
         {
+            this.ShowJson = false;
             this.selectedExample = value;
             this.Yaml = LoadResource($"LucyPad2.Client.Samples.{value}.lucy.yaml");
             await yamlEditor.SetValue(this.Yaml);
+        }
+
+        async Task OnJsonSwitch(bool value)
+        {
+            this.ShowJson = value;
+            var text = await this.yamlEditor.GetValue();
+            bool isJson = text.Trim().StartsWith("{");
+            try
+            {
+
+                if (this.ShowJson == true)
+                {
+                    if (!isJson)
+                    {
+                        var doc = yamlDeserializer.Deserialize<LucyDocument>(new StringReader(text));
+                        await yamlEditor.SetValue(JsonConvert.SerializeObject(doc, Formatting.Indented));
+                    }
+                }
+                else
+                {
+                    if (isJson)
+                    {
+                        var doc = JsonConvert.DeserializeObject<LucyDocument>(text);
+                        var yaml = new SerializerBuilder()
+                            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                            .Build()
+                            .Serialize(doc);
+                        await yamlEditor.SetValue(yaml);
+                    }
+                }
+            }
+            catch (SemanticErrorException err)
+            {
+                this.Error = err.Message;
+                this.alertBox.Show();
+                //this.editor.ScrollToLine(err.Start.Line);
+                //var line = this.editor.Document.GetLineByNumber(err.Start.Line - 1);
+                //this.editor.Select(line.Offset, line.Length);
+            }
+            catch (SyntaxErrorException err)
+            {
+                this.Error = err.Message;
+                this.alertBox.Show();
+                //this.error.Visibility = Visibility.Visible;
+                //this.editor.ScrollToLine(err.Start.Line);
+                //var line = this.editor.Document.GetLineByNumber(err.Start.Line - 1);
+                //this.editor.Select(line.Offset, line.Length);
+            }
+            catch (Exception err)
+            {
+                this.Error = err.Message;
+                this.alertBox.Show();
+                //this.error.Content = err.Message;
+                //this.error.Visibility = Visibility.Visible;
+            }
         }
 
         private string LoadResource(string name)

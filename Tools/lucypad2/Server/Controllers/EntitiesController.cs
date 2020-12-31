@@ -18,15 +18,6 @@ namespace LucyPad2.Server.Controllers
     [Route("[controller]")]
     public class EntitiesController : ControllerBase
     {
-        private JsonConverter patternModelConverter = new PatternConverter();
-
-        private IDeserializer yamlDeserializer = new DeserializerBuilder()
-                                                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                                                    .Build();
-        private ISerializer yamlToJsonSerializer = new SerializerBuilder()
-                                                .JsonCompatible()
-                                                .Build();
-
         private IMemoryCache _cache;
 
         public EntitiesController(IMemoryCache memoryCache)
@@ -43,11 +34,7 @@ namespace LucyPad2.Server.Controllers
             {
                 try
                 {
-
-                    var x = yamlDeserializer.Deserialize(new StringReader(request.yaml));
-                    var json = yamlToJsonSerializer.Serialize(x);
-                    var model = JsonConvert.DeserializeObject<LucyDocument>(json, patternModelConverter);
-                    engine = new LucyEngine(model, useAllBuiltIns: true);
+                    engine = new LucyEngine(request.yaml, useAllBuiltIns: true);
                     _cache.Set(request.yaml, engine);
                 }
                 catch (Exception err)

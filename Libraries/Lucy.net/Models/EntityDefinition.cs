@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using YamlDotNet.Serialization;
 
 namespace Lucy
 {
@@ -25,20 +26,23 @@ namespace Lucy
         /// If this is set to true, then fuzzy match will be used for all tokens
         /// in the patterns by default, and ~ modifier will turn OFF fuzzy match.
         /// </remarks>
-        [JsonProperty("fuzzyMatch")]
+        [JsonProperty("fuzzyMatch", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [YamlMember(DefaultValuesHandling=DefaultValuesHandling.OmitDefaults)]
         public bool FuzzyMatch { get; set; } = false;
 
         /// <summary>
         /// Example utterances for this entity.
         /// </summary>
-        [JsonProperty("examples")]
-        public List<string> Examples { get; set; } = new List<string>();
+        [JsonProperty("examples", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
+        public List<string> Examples { get; set; } 
 
         /// <summary>
         /// Ignore tokens.
         /// </summary>
-        [JsonProperty("ignore")]
-        public List<string> Ignore{ get; set; } = new List<string>();
+        [JsonProperty("ignore", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)]
+        public List<string> Ignore{ get; set; } 
 
         /// <summary>
         /// patterns which define the entity

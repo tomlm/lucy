@@ -272,19 +272,17 @@ externalEntities: ['@foo','@bar']
 # Using the Library
 Add a reference to "lucy.net" nuget package.
 
-## With YAML
+## With YAML or JSON string
 
 ```cs
-    var engine = new LucyEngine(yaml);
+    var engine = new LucyEngine(yamlOrJson);
     var results = engine.MatchEntities(text);
 ```
 
-## With JSON
-
-Pass in a PatternConverter to allow patterns to be a string or a string array.
+## With LucyDocument
 
 ```cs
-    var model= JsonConvert.DeserializeObject<LucyDocument>(json, new PatternConverter());
+    LucyDocument model ...;
     var engine = new LucyEngine(model);
     var results = engine.MatchEntities(text);
 ```

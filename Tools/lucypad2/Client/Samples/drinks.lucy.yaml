@@ -55,7 +55,7 @@ entities:
 
   # ---------- WHISKY
   - name: "@whiskey"
-    exammples: 
+    examples: 
       - 2 shots of makers, neat
       - 2 tumblers of bourbon, on the rocks
     ignore: [of, umm, maybe, also]

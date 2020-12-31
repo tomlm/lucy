@@ -183,14 +183,3 @@ entities:
     patterns:
     - '@drinkOrder @or @drinkOrder'
 
-intents:
-  - name: match
-    examples:
-      - book a flight from new york to SEA on friday
-      - the box is 12 inches wide by 14
-      - it is 15 feet tall
-      - my name is Boba Fett
-      - you can call me Boba
-      - people call me "john wick"
-      - change my flight to new york
-      - show me my flight

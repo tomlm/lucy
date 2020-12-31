@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Core;
-using Lucene.Net.Analysis.Phonetic;
-using Lucene.Net.Analysis.Phonetic.Language.Bm;
-using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Analysis.Util;
-using Lucene.Net.Util;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Lucy
@@ -25,19 +17,19 @@ namespace Lucy
         /// <summary>
         /// The names of any external entities that may be passed in.
         /// </summary>
-        [JsonProperty("externalEntities")]
-        public List<string> ExternalEntities { get; set; } = new List<string>();
-
-        /// <summary>
-        /// Entity definitions
-        /// </summary>
-        [JsonProperty("entities")]
-        public List<EntityDefinition> Entities { get; set; } = new List<EntityDefinition>();
+        [JsonProperty("externalEntities", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public List<string> ExternalEntities { get; set; }
 
         /// <summary>
         /// Macros
         /// </summary>
-        [JsonProperty("macros")]
+        [JsonProperty("macros", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, string> Macros { get; set; }
+
+        /// <summary>
+        /// Entity definitions
+        /// </summary>
+        [JsonProperty("entities", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public List<EntityDefinition> Entities { get; set; } = new List<EntityDefinition>();
     }
 }
