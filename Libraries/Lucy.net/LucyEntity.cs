@@ -44,6 +44,12 @@ namespace Lucy
         [JsonProperty("children")]
         public LucyEntitySet Children { get; set; } = new LucyEntitySet();
 
+        /// <summary>
+        /// Source of entity.
+        /// </summary>
+        [JsonIgnore]
+        public EntityPattern Source;
+
         public bool Contains(LucyEntity entity)
         {
             if (this == entity)

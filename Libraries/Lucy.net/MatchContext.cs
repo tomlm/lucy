@@ -67,7 +67,7 @@ namespace Lucy
         /// <param name="entity"></param>
         public void AddToCurrentEntity(LucyEntity entity)
         {
-            var token = this.GetFirstTokenEntity(entity.Start);
+            var token = GetFirstTokenEntity(entity.Start);
             if (token != null)
             {
                 var prevToken = token.Previous;
@@ -86,11 +86,11 @@ namespace Lucy
             }
             CurrentEntity.Children.Add(entity);
 
-            this.MergeEntities(CurrentEntity.Children);
-            this.ResolveEntities(CurrentEntity.Children);
+            MergeEntities(CurrentEntity.Children);
+            ResolveEntities(CurrentEntity.Children);
 
             CurrentEntity.End = CurrentEntity.Children.Max(e => e.End);
-            CurrentEntity.Score = CurrentEntity.GetAllEntities().Count() + ((float)(CurrentEntity.End - CurrentEntity.Start) / this.Text.Length);
+            CurrentEntity.Score = CurrentEntity.GetAllEntities().Count() + ((float)(CurrentEntity.End - CurrentEntity.Start) / Text.Length);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Lucy
         /// <returns></returns>
         public bool IsTokenMatched(LucyEntity tokenEntity)
         {
-            return this.Entities.Any(e => e.Start == tokenEntity.Start);
+            return Entities.Any(e => e.Start == tokenEntity.Start);
         }
 
         /// <summary>
@@ -110,12 +110,12 @@ namespace Lucy
         /// <returns></returns>
         public TokenEntity GetFirstTokenEntity(int start = 0)
         {
-            if (this.EntityPattern != null)
+            if (EntityPattern != null)
             {
-                return this.TokenEntities.Where(tokenEntity => tokenEntity.Start >= start && !this.EntityPattern.Ignore.Contains(tokenEntity.Text)).FirstOrDefault();
+                return TokenEntities.Where(tokenEntity => tokenEntity.Start >= start && !EntityPattern.Ignore.Contains(tokenEntity.Text)).FirstOrDefault();
             }
 
-            return this.TokenEntities.Where(tokenEntity => tokenEntity.Start >= start).FirstOrDefault();
+            return TokenEntities.Where(tokenEntity => tokenEntity.Start >= start).FirstOrDefault();
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Lucy
         /// <returns></returns>
         public TokenEntity GetLastTokenEntity()
         {
-            return this.TokenEntities.LastOrDefault(tokenEntity => !this.EntityPattern.Ignore.Contains(tokenEntity.Text));
+            return TokenEntities.LastOrDefault(tokenEntity => !EntityPattern.Ignore.Contains(tokenEntity.Text));
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Lucy
         public TokenEntity GetNextTokenEntity(TokenEntity tokenEntity)
         {
             var result = tokenEntity.Next;
-            while (result != null && this.EntityPattern.Ignore.Contains(result.Text))
+            while (result != null && EntityPattern.Ignore.Contains(result.Text))
             {
                 result = result.Next;
             }
@@ -149,7 +149,7 @@ namespace Lucy
         public TokenEntity GetPrevTokenEntity(TokenEntity tokenEntity)
         {
             var result = tokenEntity?.Previous;
-            while (result != null && this.EntityPattern.Ignore.Contains(result.Text))
+            while (result != null && EntityPattern.Ignore.Contains(result.Text))
             {
                 result = result.Previous;
             }
@@ -179,8 +179,8 @@ namespace Lucy
 
                             foreach (var entity in entitiesOfType)
                             {
-                                var tokenStart = this.GetFirstTokenEntity(entity.Start);
-                                var tokenNext = this.GetFirstTokenEntity(entity.End);
+                                var tokenStart = GetFirstTokenEntity(entity.Start);
+                                var tokenNext = GetFirstTokenEntity(entity.End);
 
                                 // if it hasn't been merged already.
                                 if (!removeEntities.Contains(entity))
@@ -212,8 +212,8 @@ namespace Lucy
                                             else if (entity.Resolution?.ToString() == alternateEntity.Resolution?.ToString())
                                             {
                                                 // if entity is next to alternateEntity
-                                                var altTokenStart = this.GetFirstTokenEntity(alternateEntity.Start);
-                                                var altTokenNext = this.GetFirstTokenEntity(alternateEntity.End);
+                                                var altTokenStart = GetFirstTokenEntity(alternateEntity.Start);
+                                                var altTokenNext = GetFirstTokenEntity(alternateEntity.End);
                                                 if (tokenNext == altTokenStart || altTokenNext == tokenStart)
                                                 {
                                                     removeEntities.Add(entity);
@@ -314,7 +314,7 @@ namespace Lucy
                 Start = Math.Min(entity.Start, alternateEntity.Start),
                 End = Math.Max(entity.End, alternateEntity.End),
             };
-            mergedEntity.Text = this.Text.Substring(mergedEntity.Start, mergedEntity.End - mergedEntity.Start);
+            mergedEntity.Text = Text.Substring(mergedEntity.Start, mergedEntity.End - mergedEntity.Start);
             if (entity.Resolution != null && alternateEntity.Resolution == null)
             {
                 mergedEntity.Resolution = entity.Resolution;
@@ -358,11 +358,11 @@ namespace Lucy
 
             if (mergedEntity.Children.Count > 1)
             {
-                this.MergeEntities(mergedEntity.Children);
-                this.ResolveEntities(mergedEntity.Children);
+                MergeEntities(mergedEntity.Children);
+                ResolveEntities(mergedEntity.Children);
             }
 
-            mergedEntity.Score = mergedEntity.GetAllEntities().Count() + ((float)(mergedEntity.End - mergedEntity.Start) / this.Text.Length);
+            mergedEntity.Score = mergedEntity.GetAllEntities().Count() + ((float)(mergedEntity.End - mergedEntity.Start) / Text.Length);
             return mergedEntity;
         }
     }

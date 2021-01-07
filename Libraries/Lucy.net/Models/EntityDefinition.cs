@@ -50,6 +50,12 @@ namespace Lucy
         [JsonProperty("patterns")]
         public List<Pattern> Patterns { get; set; }  = new List<Pattern>();
 
+        /// <summary>
+        /// validation patterns for entity.
+        /// </summary>
+        [JsonProperty("validation")]
+        public List<Pattern> Validation { get; set; } = new List<Pattern>();
+
         public override string ToString() => $"{Name}{(FuzzyMatch ? "~" : "")}";
     }
 }

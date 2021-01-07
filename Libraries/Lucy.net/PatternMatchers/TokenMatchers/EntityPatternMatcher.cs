@@ -45,7 +45,7 @@ namespace Lucy.PatternMatchers
 
         public override IEnumerable<string> GenerateExamples(LucyEngine engine)
         {
-            foreach (var entityPattern in engine.EntityPatterns.Where(ep => ep.Name == EntityType))
+            foreach (var entityPattern in engine.Patterns.Simple.Where(ep => ep.Name == EntityType))
             {
                 foreach (var example in entityPattern.PatternMatcher.GenerateExamples(engine))
                 {
@@ -115,7 +115,7 @@ namespace Lucy.PatternMatchers
                     return QuotedTextPhrasess[rnd.Next(QuotedTextPhrasess.Length)];
 
                 default:
-                    var entityPatterns = engine.EntityPatterns.Where(ep => ep.Name == EntityType).ToList();
+                    var entityPatterns = engine.Patterns.Simple.Where(ep => ep.Name == EntityType).ToList();
                     if (entityPatterns.Any())
                     {
 

@@ -60,8 +60,17 @@ entities:
     - porter
     
   - name: '@beer'
-    patterns:
-    - ($quantity)? (@drinkSize)? (@container)? (of)? (@drinkTemp)* (@beerStyle|@beerLabel|beer)+ (in a @container)? 
+    validation:
+    - (@beerStyle|@beerLabel|beer)
+    - ($quantity)?
+    - (@drinkSize)?
+    - (@container)?
+    - (@drinkTemp)?
+    - (@number)
+    - /doo/
+    - beer is ___
+#    patterns:
+#    - ($quantity)? (@drinkSize)? (@container)? (of)? (@drinkTemp)* (@beerStyle|@beerLabel|beer)+ (in a @container)? 
     examples:
     - a cold pitcher of coors
     - a cold mug of beer
@@ -80,8 +89,13 @@ entities:
     - white
 
   - name: '@wine'
-    patterns:
-    - ($quantity)? (@drinkSize)? (@container)? (of)? (@wineStyle|@wineLabel|wine|vino)+ (in a @container)? 
+    validation:
+    - (@wineStyle|@wineLabel|wine|vino)
+    - ($quantity)?
+    - (@drinkSize)?
+    - (@container)?
+#    patterns:
+#    - ($quantity)? (@drinkSize)? (@container)? (of)? (@wineStyle|@wineLabel|wine|vino)+ (in a @container)? 
 
 # ---------- WHISKY
   - name: '@whiskeyStyle'
@@ -98,8 +112,13 @@ entities:
     - glenhaven
 
   - name: '@whiskey'
-    patterns:
-    - ($quantity)? (@drinkSize)? (@container)? (of)? (@whiskeyLabel|@whiskeyStyle|(whiskey|borboun)~)+ (in a @container)? 
+    validation:
+    - (@whiskeyLabel|@whiskeyStyle|(whiskey|borboun)~)
+    - ($quantity)?
+    - (@drinkSize)?
+    - (@container)?
+#    patterns:
+#    - ($quantity)? (@drinkSize)? (@container)? (of)? (@whiskeyLabel|@whiskeyStyle|(whiskey|borboun)~)+ (in a @container)? 
 
 # ---------- COFFEE
   - name: '@coffeeStyle'
@@ -109,6 +128,7 @@ entities:
     - espresso
     - (cappucino)~
     - (latte)~
+    - (americano)~
 
   - name: '@coffeeAdditives'
     patterns:
@@ -119,31 +139,40 @@ entities:
     - sugar
     
   - name: '@coffee'
-    patterns:
-    - ($quantity)? (@drinkSize)? (@container)? (of)? (@drinkTemp)* (@coffeeStyle|@coffeeAdditives|coffee|joe)+ (with|@coffeeStyle|@coffeeAdditives)* (in a @container)? 
+    validation:
+    - (@coffeeStyle|coffee|joe)
+    - (@container)?
+    - (@drinkTemp)?
+    - (@coffeeAdditives)*
+#    patterns:
+#    - ($quantity)? (@drinkSize)? (@container)? (of)? (@drinkTemp)* (@coffeeStyle|@coffeeAdditives|coffee|joe)+ (with|@coffeeStyle|@coffeeAdditives)* (in a @container)? 
 
 # -------- DRINK ORDER
 
   - name: '@drinkOrder'
-    patterns:
-    - (@beer|@whiskey|@wine|@coffee|a beverage|to drink)
+    validation:
+    - (@beer|@whiskey|@wine|@coffee)
+#    patterns:
+#    - (@beer|@whiskey|@wine|@coffee|a beverage|to drink)
 
   - name: '@drinkOrders'
-    patterns:
-    - '@drinkOrder (@conjunction @drinkOrder)*'
+    validation:
+    - (@drinkOrder)+
+#    patterns:
+#    - '@drinkOrder (@conjunction @drinkOrder)*'
 
-  - name: '@desireIntent'
-    patterns:
-    - (can|can you|I|we)? (also|want|would|like|to|have|order|you|bring|us|me)+ (@drinkOrders)+
+#  - name: '@desireIntent'
+#    patterns:
+#    - (can|can you|I|we)? (also|want|would|like|to|have|order|you|bring|us|me)+ (@drinkOrders)+
   
-  - name: '@desireIntents'
-    patterns:
-    - '@desireIntent (@conjunction @desireIntent)*'
+#  - name: '@desireIntents'
+#    patterns:
+#    - '@desireIntent (@conjunction @desireIntent)*'
   
 # ------------ MISC
-  - name: '@conjunction'
-    patterns: 
-    - [or, or (maybe|perhaps)]
-    - [and, and also, also, with]
+#  - name: '@conjunction'
+#    patterns: 
+#    - [or, or (maybe|perhaps)]
+#    - [and, and also, also, with]
 
 

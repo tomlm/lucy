@@ -45,6 +45,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Newtonsoft.Json;
 using YamlDotNet.RepresentationModel;
+using System.Diagnostics;
 
 namespace Lucy
 {
@@ -113,22 +114,20 @@ namespace Lucy
         /// </summary>
         public string Locale { get; set; } = "en";
 
-        public HashSet<string> BuiltinEntities { get; set; } = new HashSet<string>();
+        /// <summary>
+        /// Collection of patterns to match.
+        /// </summary>
+        public EntityPatterns Patterns = new EntityPatterns();
 
         /// <summary>
-        /// Patterns to match
+        /// Patterns to use for validation.
         /// </summary>
-        public List<EntityPattern> EntityPatterns { get; set; } = new List<EntityPattern>();
+        public Dictionary<string, EntityPatterns> ValidationPatterns = new Dictionary<string, EntityPatterns>();
 
         /// <summary>
-        /// Wildcard Patterns to match
+        /// Mapping from a recognition pattern to the corresponding validation
         /// </summary>
-        public List<EntityPattern> WildcardEntityPatterns { get; set; } = new List<EntityPattern>();
-
-        /// <summary>
-        /// Regex patterns to match
-        /// </summary>
-        public List<RegexEntityRecognizer> RegexEntityPatterns { get; set; } = new List<RegexEntityRecognizer>();
+        public Dictionary<EntityPattern, EntityPattern> PatternToValidation = new Dictionary<EntityPattern, EntityPattern>();
 
         /// <summary>
         /// Warning messages
@@ -159,16 +158,16 @@ namespace Lucy
                 context.ProcessNewEntities();
             }
 
-            if (this.BuiltinEntities.Any())
+            if (Patterns.BuiltIn.Any())
             {
                 AddBuiltInEntities(context, text, Locale);
                 context.ProcessNewEntities();
             }
 
             // Add regex pattern entities
-            if (this.RegexEntityPatterns.Any())
+            if (Patterns.Regex.Any())
             {
-                foreach (var regex in this.RegexEntityPatterns)
+                foreach (var regex in Patterns.Regex)
                 {
                     foreach (var entity in regex.Matches(text))
                     {
@@ -190,7 +189,7 @@ namespace Lucy
                 foreach (var tokenEntity in context.TokenEntities)
                 {
                     // foreach entity pattern
-                    foreach (var entityPattern in EntityPatterns)
+                    foreach (var entityPattern in Patterns.Simple)
                     {
                         ProcessEntityPattern(context, tokenEntity, entityPattern);
                     }
@@ -199,12 +198,12 @@ namespace Lucy
                 context.ProcessNewEntities();
 
                 // if entities were added we need to run wildcard matchers
-                if (count == context.Entities.Count && WildcardEntityPatterns.Any())
+                if (count == context.Entities.Count && Patterns.Wildcard.Any())
                 {
                     // process wildcard patterns
                     foreach (var textEntity in context.TokenEntities)
                     {
-                        foreach (var entityPattern in WildcardEntityPatterns)
+                        foreach (var entityPattern in Patterns.Wildcard)
                         {
                             ProcessEntityPattern(context, textEntity, entityPattern);
                         }
@@ -229,8 +228,8 @@ namespace Lucy
 
         public IEnumerable<string> GenerateExamples(string entityType)
         {
-            var patterns = new List<EntityPattern>(this.EntityPatterns.Where(et => et.Name == entityType));
-            patterns.AddRange(this.WildcardEntityPatterns.Where(et => et.Name == entityType));
+            var patterns = new List<EntityPattern>(Patterns.Simple.Where(et => et.Name == entityType));
+            patterns.AddRange(Patterns.Wildcard.Where(et => et.Name == entityType));
             foreach (var ep in patterns)
             {
                 foreach (var example in ep.PatternMatcher.GenerateExamples(this))
@@ -245,8 +244,8 @@ namespace Lucy
 
         public string GenerateExample(string entityType)
         {
-            //var patterns = new List<EntityPattern>(this.EntityPatterns.Where(et => et.Name == entityType));
-            //patterns.AddRange(this.WildcardEntityPatterns.Where(et => et.Name == entityType));
+            //var patterns = new List<EntityPattern>(Patterns.Where(et => et.Name == entityType));
+            //patterns.AddRange(WildcardEntityPatterns.Where(et => et.Name == entityType));
             //var ep = patterns[_rnd.Next(patterns.Count)];
             //return ep.PatternMatcher.GenerateExample(this);
             return string.Empty;
@@ -466,6 +465,7 @@ namespace Lucy
             {
                 Type = entityPattern.Name,
                 Resolution = entityPattern.Resolution,
+                Source = entityPattern,
                 Start = textEntity.Start
             };
 
@@ -509,13 +509,87 @@ namespace Lucy
             }
         }
 
+        private EntityPatterns LoadPatterns(List<Pattern> patterns, string name, bool fuzzyMatch, List<string> ignore)
+        {
+            var entityPatterns = new EntityPatterns();
+            if (patterns != null)
+            {
+                foreach (var patternModel in patterns)
+                {
+                    var first = patternModel.First();
+                    string resolution = first.Any(ch => ch == '@' || ch == '|' || ch == '+' || ch == '*' || ch == '?') || first.Contains("___") ? null : first.Trim('~', '(', ')');
+
+                    foreach (var pattern in patternModel.Select(pat => ExpandMacros(pat)).OrderByDescending(pat => pat.Length))
+                    {
+                        if (pattern.StartsWith('/') && pattern.EndsWith('/'))
+                        {
+                            entityPatterns.Regex.Add(new RegexEntityRecognizer(name, pattern.Trim('/')));
+                        }
+                        else
+                        {
+                            var patternMatcher = _patternParser.Parse(pattern, fuzzyMatch);
+                            if (patternMatcher != null)
+                            {
+                                var ignoreWords = ignore?.Select(ignoreText => ((TokenResolution)Tokenize(ignoreText).First().Resolution).Token) ?? Array.Empty<string>();
+
+                                // Trace.TraceInformation($"{expandedPattern} => {patternMatcher}");
+                                if (patternMatcher.ContainsWildcard())
+                                {
+                                    // we want to process wildcard patterns last
+                                    entityPatterns.Wildcard.Add(new EntityPattern(name, resolution, patternMatcher, ignoreWords));
+                                }
+                                else
+                                {
+                                    entityPatterns.Simple.Add(new EntityPattern(name, resolution, patternMatcher, ignoreWords));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Auto detect all references to built in entities
+                foreach (var pattern in entityPatterns.Simple)
+                {
+                    foreach (var reference in pattern.PatternMatcher.GetEntityReferences().Select(r => r.TrimStart('@')))
+                    {
+                        if (reference == "datetime" || reference == "datetimeV2")
+                        {
+                            Patterns.BuiltIn.Add("datetime");
+
+                            // add default pattern for datetime = (all permutations of datetime)
+                            entityPatterns.Simple.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
+                        }
+
+                        if (builtinEntities.Contains(reference) ||
+                            builtinEntities.Contains(reference.Split('.').First()))
+                        {
+                            Patterns.BuiltIn.Add(reference);
+                        }
+                    }
+                }
+            }
+            return entityPatterns;
+        }
+
+        private EntityPattern Singleton(EntityPattern pattern)
+        {
+            var result = pattern;
+            if (pattern.PatternMatcher is OrdinalityPatternMatcher ordinal && ordinal.Ordinality != Ordinality.One)
+            {
+                // Convert ordinality to required
+                result = new EntityPattern(pattern.Name, new OrdinalityPatternMatcher(ordinal.Ordinality, ordinal.PatternMatchers), pattern.Ignore);
+                PatternToValidation.Add(result, pattern);
+            }
+            return result;
+        }
+
         private void LoadDocument(LucyDocument model, Analyzer exactAnalyzer, Analyzer fuzzyAnalyzer, Boolean useAllBuiltIns)
         {
-            this._lucyModel = model;
+            _lucyModel = model;
 
-            this._exactAnalyzer = exactAnalyzer ?? GetAnalyzerForLocale(model.Locale);
+            _exactAnalyzer = exactAnalyzer ?? GetAnalyzerForLocale(model.Locale);
 
-            this._fuzzyAnalyzer = exactAnalyzer ?? fuzzyAnalyzer ??
+            _fuzzyAnalyzer = exactAnalyzer ?? fuzzyAnalyzer ??
                 Analyzer.NewAnonymous((field, textReader) =>
                 {
                     Tokenizer tokenizer = new StandardTokenizer(LuceneVersion.LUCENE_48, textReader);
@@ -529,7 +603,7 @@ namespace Lucy
                     return new TokenStreamComponents(tokenizer, stream);
                 });
 
-            this._patternParser = new PatternParser(this._exactAnalyzer, this._fuzzyAnalyzer); ;
+            _patternParser = new PatternParser(_exactAnalyzer, _fuzzyAnalyzer); ;
 
             if (_lucyModel.Macros == null)
             {
@@ -540,70 +614,38 @@ namespace Lucy
             {
                 foreach (var entityModel in _lucyModel.Entities)
                 {
-                    if (entityModel.Patterns != null)
+                    Patterns.AddPatterns(LoadPatterns(entityModel.Patterns, entityModel.Name, entityModel.FuzzyMatch, entityModel.Ignore));
+                    var validationPatterns = LoadPatterns(entityModel.Validation, entityModel.Name, entityModel.FuzzyMatch, entityModel.Ignore);
+
+                    if (validationPatterns.Any())
                     {
-                        foreach (var patternModel in entityModel.Patterns)
+                        // Add patterns to recognize validation parts
+                        ValidationPatterns.Add(entityModel.Name, validationPatterns);
+                        foreach (var simple in validationPatterns.Simple)
                         {
-                            var first = patternModel.First();
-                            string resolution = first.Any(ch => ch == '@' || ch == '|' || ch == '+' || ch == '*' || ch == '?') || first.Contains("___") ? null : first.Trim('~', '(', ')');
-
-                            foreach (var pattern in patternModel.Select(pat => ExpandMacros(pat)).OrderByDescending(pat => pat.Length))
-                            {
-                                if (pattern.StartsWith('/') && pattern.EndsWith('/'))
-                                {
-                                    RegexEntityPatterns.Add(new RegexEntityRecognizer(entityModel.Name, pattern.Trim('/')));
-                                }
-                                else
-                                {
-                                    var patternMatcher = _patternParser.Parse(pattern, entityModel.FuzzyMatch);
-                                    if (patternMatcher != null)
-                                    {
-                                        var ignoreWords = entityModel.Ignore?.Select(ignoreText => ((TokenResolution)Tokenize(ignoreText).First().Resolution).Token) ?? Array.Empty<string>();
-
-                                        // Trace.TraceInformation($"{expandedPattern} => {patternMatcher}");
-                                        if (patternMatcher.ContainsWildcard())
-                                        {
-                                            // we want to process wildcard patterns last
-                                            WildcardEntityPatterns.Add(new EntityPattern(entityModel.Name, resolution, patternMatcher, ignoreWords));
-                                        }
-                                        else
-                                        {
-                                            EntityPatterns.Add(new EntityPattern(entityModel.Name, resolution, patternMatcher, ignoreWords));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Auto detect all references to built in entities
-                foreach (var pattern in this.EntityPatterns.ToList())
-                {
-                    foreach (var reference in pattern.PatternMatcher.GetEntityReferences().Select(r => r.TrimStart('@')))
-                    {
-                        if (reference == "datetime" || reference == "datetimeV2")
-                        {
-                            this.BuiltinEntities.Add("datetime");
-
-                            // add default pattern for datetime = (all permutations of datetime)
-                            EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
+                            Patterns.Simple.Add(Singleton(simple));
                         }
 
-                        if (builtinEntities.Contains(reference) ||
-                            builtinEntities.Contains(reference.Split('.').First()))
+                        foreach (var wildcard in validationPatterns.Wildcard)
                         {
-                            this.BuiltinEntities.Add(reference);
+                            Patterns.Wildcard.Add(Singleton(wildcard));
                         }
+
+                        if (validationPatterns.Regex.Any())
+                        {
+                            Warnings.Add($"WARNING: {entityModel.Name} cannot have regex for validation.");
+                        }
+
+                        Debug.Assert(!validationPatterns.BuiltIn.Any());
                     }
                 }
             }
 
             if (useAllBuiltIns)
             {
-                BuiltinEntities = new HashSet<string>(builtinEntities);
+                Patterns.BuiltIn = new HashSet<string>(builtinEntities);
                 // add default pattern for datetime = (all permutations of datetime)
-                EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
+                Patterns.Simple.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
             }
 
             ValidateModel();
@@ -617,17 +659,17 @@ namespace Lucy
                 "datetimeV2.daterange", "datetimeV2.timerange", "datetimeV2.datetimerange",
                 "datetimeV2.duration", "ordinal.relative", "wildcard"
             };
-            
-            if (this._lucyModel.ExternalEntities != null)
+
+            if (_lucyModel.ExternalEntities != null)
             {
-                foreach (var externlEntity in this._lucyModel.ExternalEntities)
+                foreach (var externlEntity in _lucyModel.ExternalEntities)
                 {
                     entityDefinitions.Add(externlEntity);
                 }
             }
 
             HashSet<string> entityReferences = new HashSet<string>();
-            foreach (var pattern in this.EntityPatterns)
+            foreach (var pattern in Patterns.Simple)
             {
                 entityDefinitions.Add(pattern.Name);
                 foreach (var reference in pattern.PatternMatcher.GetEntityReferences())
@@ -636,7 +678,7 @@ namespace Lucy
                 }
             }
 
-            foreach (var pattern in this.WildcardEntityPatterns)
+            foreach (var pattern in Patterns.Wildcard)
             {
                 entityDefinitions.Add(pattern.Name);
                 foreach (var reference in pattern.PatternMatcher.GetEntityReferences())
@@ -680,7 +722,7 @@ namespace Lucy
                     {
                         start--;
                         var macroName = pattern.Substring(start, end - start);
-                        if (this._lucyModel.Macros.TryGetValue(macroName, out string value))
+                        if (_lucyModel.Macros.TryGetValue(macroName, out string value))
                         {
                             occurences.Push(new Occurence() { Start = start, Value = value, End = end });
                         }
@@ -704,7 +746,7 @@ namespace Lucy
         private void AddBuiltInEntities(MatchContext context, string text, string culture)
         {
             List<builtin.ModelResult> results = null;
-            foreach (var name in BuiltinEntities)
+            foreach (var name in Patterns.BuiltIn)
             {
                 switch (name)
                 {
