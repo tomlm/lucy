@@ -66,11 +66,8 @@ entities:
     - (@drinkSize)?
     - (@container)?
     - (@drinkTemp)?
-    - (@number)
-    - /doo/
-    - beer is ___
-#    patterns:
-#    - ($quantity)? (@drinkSize)? (@container)? (of)? (@drinkTemp)* (@beerStyle|@beerLabel|beer)+ (in a @container)? 
+    patterns:
+    - ($quantity)? (@drinkSize)? (@container)? (of)? (@drinkTemp)* (@beerStyle|@beerLabel|beer)+ (in a @container)? 
     examples:
     - a cold pitcher of coors
     - a cold mug of beer

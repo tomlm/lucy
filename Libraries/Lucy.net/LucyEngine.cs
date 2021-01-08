@@ -144,7 +144,7 @@ namespace Lucy
         /// <returns>entities</returns>
         public IList<LucyEntity> MatchEntities(string text, IEnumerable<LucyEntity> externalEntities = null, bool includeInternal = false)
         {
-            var context = new MatchContext()
+            var context = new MatchContext(this)
             {
                 Text = text,
             };
