@@ -597,6 +597,15 @@ namespace Lucy
                         }
                     }
                 }
+
+                foreach(var externalEntity in model.ExternalEntities)
+                {
+                    if (builtinEntities.Contains(externalEntity) ||
+                        builtinEntities.Contains(externalEntity.Split('.').First()))
+                    {
+                        this.BuiltinEntities.Add(externalEntity);
+                    }
+                }
             }
 
             if (useAllBuiltIns)
@@ -633,6 +642,14 @@ namespace Lucy
                 foreach (var reference in pattern.PatternMatcher.GetEntityReferences())
                 {
                     entityReferences.Add(reference);
+                }
+            }
+
+            if (this.BuiltinEntities != null)
+            {
+                foreach(var builtin in this.BuiltinEntities)
+                {
+                    entityReferences.Add(builtin);
                 }
             }
 
