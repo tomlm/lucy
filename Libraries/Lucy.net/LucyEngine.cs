@@ -598,12 +598,15 @@ namespace Lucy
                     }
                 }
 
-                foreach(var externalEntity in model.ExternalEntities)
+                if (model.ExternalEntities != null)
                 {
-                    if (builtinEntities.Contains(externalEntity) ||
-                        builtinEntities.Contains(externalEntity.Split('.').First()))
+                    foreach (var externalEntity in model.ExternalEntities)
                     {
-                        this.BuiltinEntities.Add(externalEntity);
+                        if (builtinEntities.Contains(externalEntity) ||
+                            builtinEntities.Contains(externalEntity.Split('.').First()))
+                        {
+                            this.BuiltinEntities.Add(externalEntity);
+                        }
                     }
                 }
             }
@@ -626,7 +629,7 @@ namespace Lucy
                 "datetimeV2.daterange", "datetimeV2.timerange", "datetimeV2.datetimerange",
                 "datetimeV2.duration", "ordinal.relative", "wildcard"
             };
-            
+
             if (this._lucyModel.ExternalEntities != null)
             {
                 foreach (var externlEntity in this._lucyModel.ExternalEntities)
@@ -647,7 +650,7 @@ namespace Lucy
 
             if (this.BuiltinEntities != null)
             {
-                foreach(var builtin in this.BuiltinEntities)
+                foreach (var builtin in this.BuiltinEntities)
                 {
                     entityReferences.Add(builtin);
                 }
