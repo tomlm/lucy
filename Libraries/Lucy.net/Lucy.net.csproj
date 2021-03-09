@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <Version>1.0.5-preview</Version>
-        <AssemblyVersion>1.0.5.0</AssemblyVersion>
+        <Version>1.0.6-preview</Version>
+        <AssemblyVersion>1.0.6.0</AssemblyVersion>
         <Description>Lucy Entity Recgonition Engine.</Description>
         <Company>Microsoft</Company>
         <Authors>Tom Laird-McConnell</Authors>
@@ -26,12 +26,12 @@
         <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00013" />
         <PackageReference Include="Lucene.Net.Analysis.Phonetic" Version="4.8.0-beta00013" />
         <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00013" />
-        <PackageReference Include="Microsoft.Recognizers.Text.Choice" Version="1.2.9" />
-        <PackageReference Include="Microsoft.Recognizers.Text.DateTime" Version="1.2.9" />
-        <PackageReference Include="Microsoft.Recognizers.Text.Number" Version="1.2.9" />
-        <PackageReference Include="Microsoft.Recognizers.Text.Sequence" Version="1.2.9" />
+        <PackageReference Include="Microsoft.Recognizers.Text.Choice" Version="1.5.0" />
+        <PackageReference Include="Microsoft.Recognizers.Text.DateTime" Version="1.5.0" />
+        <PackageReference Include="Microsoft.Recognizers.Text.Number" Version="1.5.0" />
+        <PackageReference Include="Microsoft.Recognizers.Text.Sequence" Version="1.5.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="YamlDotNet" Version="9.1.0" />
+        <PackageReference Include="YamlDotNet" Version="9.1.4" />
     </ItemGroup>
 
 </Project>

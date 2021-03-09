@@ -796,13 +796,13 @@ namespace Lucy
                     var type = result.TypeName;
                     if (type == "number")
                     {
-                        var subType = (string)result.Resolution["subtype"];
-                        if (builtinEntities.Contains(subType))
+                        result.Resolution.TryGetValue("subtype", out var subType);
+                        if (builtinEntities.Contains(type) || builtinEntities.Contains(subType))
                         {
                             context.AddNewEntity(new LucyEntity()
                             {
                                 Text = result.Text,
-                                Type = subType,
+                                Type = subType?.ToString() ?? type,
                                 Start = result.Start,
                                 End = result.End + 1,
                                 Resolution = result.Resolution["value"],
