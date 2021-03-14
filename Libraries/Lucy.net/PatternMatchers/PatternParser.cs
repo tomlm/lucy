@@ -191,14 +191,20 @@ namespace Lucy.PatternMatchers
             throw new ArgumentOutOfRangeException("Missing matching paren");
         }
 
-        private const string NAMEDWILDCARD = ":" + WildcardPatternMatcher.ENTITYTYPE;
-        private const string NAMEDWILDCARD_TOKEN = "_" + WildcardPatternMatcher.ENTITYTYPE;
+        private const string NAME_SEPERATOR = ":";
+        private const string NAMEDWILDCARD_TOKEN = "_";
 
         private PatternMatcher CreateTextPatternMatcher(string text, bool fuzzyMatch)
         {
             // massage wildcards text so it survives tokenization "foo:___" => foo_wildcard
+            string name = null;
+            var iName = text.IndexOf(NAME_SEPERATOR);
+            if (iName > 0)
+            {
+                name = text.Substring(0, iName);
+                text = text.Substring(iName + 1);
+            }
             text = text.Replace("___", WildcardPatternMatcher.ENTITYTYPE);
-            text = text.Replace(NAMEDWILDCARD, NAMEDWILDCARD_TOKEN);
 
             var sequence = new SequencePatternMatcher();
             using (TextReader reader = new StringReader(text))
@@ -225,14 +231,11 @@ namespace Lucy.PatternMatchers
                                 end = offsetAtt.EndOffset;
                                 tokenText = text.Substring(start, end - start);
                             }
-                            sequence.PatternMatchers.Add(new EntityPatternMatcher(tokenText));
+                            sequence.PatternMatchers.Add(new EntityPatternMatcher(name, tokenText));
                         }
-                        else if (token.EndsWith(WildcardPatternMatcher.ENTITYTYPE))
+                        else if (token == WildcardPatternMatcher.ENTITYTYPE)
                         {
-                            var sb = new StringBuilder(token);
-                            if (token.EndsWith(NAMEDWILDCARD_TOKEN))
-                                sb[token.LastIndexOf('_')] = ':';
-                            sequence.PatternMatchers.Add(new WildcardPatternMatcher(sb.ToString()));
+                            sequence.PatternMatchers.Add(new WildcardPatternMatcher(name));
                         }
                         else
                         {

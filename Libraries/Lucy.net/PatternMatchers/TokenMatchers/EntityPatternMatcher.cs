@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lucy.PatternMatchers
@@ -8,10 +9,13 @@ namespace Lucy.PatternMatchers
     /// </summary>
     public class EntityPatternMatcher : PatternMatcher
     {
-        public EntityPatternMatcher(string entityType)
+        public EntityPatternMatcher(string name, string entityType)
         {
+            this.Name = name;
             this.EntityType = entityType.TrimStart('@');
         }
+
+        public string Name { get; set; }
 
         public string EntityType { get; set; }
 
@@ -26,7 +30,17 @@ namespace Lucy.PatternMatchers
                 if (entity != null)
                 {
                     // add the matched entity to the children of the currentEntity.
-                    context.AddToCurrentEntity(entity);
+                    if (Name != null)
+                    {
+                        var newEntity = JsonConvert.DeserializeObject<LucyEntity>(JsonConvert.SerializeObject(entity));
+                        newEntity.Type = this.Name;
+                        newEntity.Children.Add(entity);
+                        context.AddToCurrentEntity(newEntity);
+                    }
+                    else
+                    {
+                        context.AddToCurrentEntity(entity);
+                    }
 
                     matchResult.Matched = true;
                     matchResult.End = entity.End;

@@ -651,5 +651,35 @@ namespace Lucy.Tests
             Assert.AreEqual("joe", entities[0].Children.First().Resolution);
         }
 
+        [TestMethod]
+        public void InlineNamingTest()
+        {
+            var engine = new LucyEngine(new LucyDocument()
+            {
+                Entities = new List<EntityDefinition>()
+                {
+                    new EntityDefinition() { 
+                        Name = "@test",
+                        Patterns = new List<Pattern>()
+                        {
+                            "foo (foo:@integer) bar (bar:@integer)",
+                        }
+                    },
+                }
+            });
+
+            string text = "xxx foo 33 bar 99 xxxx";
+            var results = engine.MatchEntities(text, null);
+            Trace.TraceInformation("\n" + LucyEngine.VisualEntities(text, results));
+
+            var entities = results.Where(e => e.Type == "test").ToList();
+            Assert.AreEqual(1, entities.Count);
+            Assert.AreEqual("test", entities[0].Type);
+            Assert.AreEqual("33", entities[0].Children.Single(e => e.Type == "foo").Resolution);
+            Assert.AreEqual("99", entities[0].Children.Single(e => e.Type == "bar").Resolution);
+            Assert.AreEqual("33", entities[0].Children.Single(e => e.Type == "foo").Children.Single(e=> e.Type == "integer").Resolution);
+            Assert.AreEqual("99", entities[0].Children.Single(e => e.Type == "bar").Children.Single(e=> e.Type == "integer").Resolution);
+        }
+
     }
 }

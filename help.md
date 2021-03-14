@@ -179,14 +179,15 @@ you to capture a sequence of unknown tokens into an entity.
 Repeating wildcards will take tokens until they run into a token which is claimed
 by any pattern in the system. 
 
-## Named wildcards
-You can assign entity names inline when defining a wildcard by using the pattern
-```(entityname:___)```. 
+## Inline naming of entities
+You can assign an entity names inline to a pattern when by using the *{name} ':' {entityName}*
+```(name:@entity)```. 
+```(name:___)```. 
 
 ```yaml
   - name: '@name'
     patterns:
-    - name is (firstname:___) (lastname:___)?
+    - name is (firstname:___) and age (age:@integer)?
 ```
 
 # Lucy file format

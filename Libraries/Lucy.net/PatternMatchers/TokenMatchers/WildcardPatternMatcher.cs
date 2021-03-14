@@ -13,12 +13,9 @@ namespace Lucy.PatternMatchers
 
         private string entityType = ENTITYTYPE;
 
-        public WildcardPatternMatcher(string variation = null)
+        public WildcardPatternMatcher(string entityType = null)
         {
-            if (variation != null && variation.IndexOf(":") > 0)
-            {
-                entityType = variation.Split(':').First().Trim();
-            }
+            this.entityType = entityType ?? ENTITYTYPE;
         }
 
         public override MatchResult Matches(MatchContext context, TokenEntity startToken, PatternMatcher nextPatternMatcher)
