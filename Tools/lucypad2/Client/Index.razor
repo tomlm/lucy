@@ -2,14 +2,18 @@
 @inherits LayoutComponentBase
 
 <!-- layout -->
+
 <div class="grid-app">
-    <TextEdit Class="grid-query" Placeholder="Enter utterance..." Text="@Text" TextChanged="@OnTextChanged" DelayTextOnKeyPress="true" />
+    <div class="grid-query">
+        <Image Class="grid-icon" Source="/icon-512.png" Width="50px" ></Image>
+        <TextEdit Class="grid-input" Placeholder="Enter utterance..." Text="@Text" TextChanged="@OnTextChanged" DelayTextOnKeyPress="true" />
+    </div>
 
     <Text Class="grid-yamlheading">
         <Link Target="Target.Blank" To="https://github.com/tomlm/lucy/blob/main/readme.md" Class="grid-overview">Overview</Link>
         <Link Target="Target.Blank" To="https://github.com/tomlm/lucy/blob/main/help.md" Class="grid-help">Help</Link>
         <Text Class="grid-samplesLabel">Samples:</Text>
-        <Select Clsas="grid-samplesCombo" TValue="string" SelectedValue="@selectedExample" SelectedValueChanged="@OnSelectedExampleChanged">
+        <Select Class="grid-samplesCombo" TValue="string" SelectedValue="@selectedExample" SelectedValueChanged="@OnSelectedExampleChanged">
             <SelectItem Value="@("simple")">Simple</SelectItem>
             <SelectItem Value="@("cars")">Cars</SelectItem>
             <SelectItem Value="@("drinks")">Drinks</SelectItem>
