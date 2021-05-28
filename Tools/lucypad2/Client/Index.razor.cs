@@ -1,4 +1,5 @@
-﻿using System;
+﻿// #define embedded
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,6 +33,7 @@ namespace LucyPad2.Client
         private string selectedExample;
 
         private LucyEngine engine = null;
+        private string lucyModel = null;
 
         public Index()
         {
@@ -152,11 +154,7 @@ namespace LucyPad2.Client
                     return;
                 }
 #if embedded
-                if (lucyModel != yaml)
-                {
-                    LoadModel(yaml);
-                }
-
+                LoadModel(yaml);
                 var sw = new System.Diagnostics.Stopwatch();
                 sw.Start();
                 results = engine.MatchEntities(text);
@@ -221,20 +219,24 @@ namespace LucyPad2.Client
 
         private void LoadModel(string yaml)
         {
-            // Trace.TraceInformation("Loading model");
-            engine = new LucyEngine(yaml, useAllBuiltIns: true);
-
-            // this.examplesBox.Text = sb.ToString();
-
-            if (engine.Warnings.Any())
+            if (lucyModel != yaml)
             {
-                this.Error = String.Join("\n", engine.Warnings);
-                this.alertBox.Show();
-            }
-            else
-            {
-                this.Error = string.Empty;
-                this.alertBox.Hide();
+                // Trace.TraceInformation("Loading model");
+                engine = new LucyEngine(yaml, useAllBuiltIns: true);
+                this.lucyModel = yaml;
+
+                // this.examplesBox.Text = sb.ToString();
+
+                if (engine.Warnings.Any())
+                {
+                    this.Error = String.Join("\n", engine.Warnings);
+                    this.alertBox.Show();
+                }
+                else
+                {
+                    this.Error = string.Empty;
+                    this.alertBox.Hide();
+                }
             }
         }
     }
