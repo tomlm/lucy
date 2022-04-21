@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
         <UserSecretsId>d3a18332-7d9e-4f14-9d40-ff2147e13a9c</UserSecretsId>
         <RunAOTCompilation>true</RunAOTCompilation>
