@@ -75,7 +75,7 @@ namespace Lucy
         {
             if (Resolution == null)
             {
-                return $"@{Type} [{Start},{End}] {String.Join(",", this.Children.Select(c => '@'+c.Type))}";
+                return $"@{Type} [{Start},{End}] {String.Join(",", this.Children.Select(c => '@' + c.Type))}";
             }
             var json = JsonConvert.SerializeObject(Resolution);
             return $"@{Type} [{Start},{End}] '{Text}' Resolution:{json}";
@@ -100,10 +100,13 @@ namespace Lucy
                      (entity2.Resolution == null && entity2.Resolution != null) ||
                      (this.Resolution?.GetType().Name != entity2.Resolution?.GetType().Name))
                 return false;
-            if (this.Resolution?.ToString() != entity2.Resolution?.ToString())
-                return false;
-            if (this.Children.Count != entity2.Children.Count)
-                return false;
+            if (this.Resolution != null && entity2.Resolution != null)
+            {
+                if (JToken.FromObject(this.Resolution).ToString() != JToken.FromObject(entity2.Resolution).ToString())
+                    return false;
+                if (this.Children.Count != entity2.Children.Count)
+                    return false;
+            }
 
             foreach (var child in this.Children)
             {

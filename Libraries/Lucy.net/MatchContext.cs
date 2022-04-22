@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Lucy
@@ -209,7 +211,8 @@ namespace Lucy
                                                 removeEntities.Add(alternateEntity);
                                                 newEntities.Add(Merge(entity, alternateEntity));
                                             }
-                                            else if (entity.Resolution?.ToString() == alternateEntity.Resolution?.ToString())
+                                            else if ((entity.Resolution == null && alternateEntity.Resolution == null) ||
+                                                    (JToken.FromObject(entity.Resolution).ToString() == JToken.FromObject(alternateEntity.Resolution).ToString()))
                                             {
                                                 // if entity is next to alternateEntity
                                                 var altTokenStart = this.GetFirstTokenEntity(alternateEntity.Start);
@@ -312,7 +315,7 @@ namespace Lucy
             {
                 Type = entity.Type,
                 Start = Math.Min(entity.Start, alternateEntity.Start),
-                End = Math.Max(entity.End, alternateEntity.End),
+                End = Math.Max(entity.End, alternateEntity.End)
             };
             mergedEntity.Text = this.Text.Substring(mergedEntity.Start, mergedEntity.End - mergedEntity.Start);
             if (entity.Resolution != null && alternateEntity.Resolution == null)
@@ -327,10 +330,10 @@ namespace Lucy
             {
                 mergedEntity.Resolution = entity.Resolution;
             }
-            else
+            else if (entity.Resolution is string && alternateEntity.Resolution is string)
             {
-                string resolutionText1 = entity.Resolution?.ToString();
-                string resolutionTest2 = entity.Resolution?.ToString();
+                string resolutionText1 = (string)entity.Resolution;
+                string resolutionTest2 = (string)alternateEntity.Resolution;
                 if (resolutionText1.Length > resolutionTest2.Length)
                 {
                     mergedEntity.Resolution = resolutionText1;
@@ -339,6 +342,16 @@ namespace Lucy
                 {
                     mergedEntity.Resolution = resolutionTest2;
                 }
+            }
+            else
+            {
+                if (JToken.FromObject(entity.Resolution).ToString() != JToken.FromObject(alternateEntity.Resolution).ToString())
+                {
+                    // MERGE OBJECTS
+                    throw new Exception($"MERGE entities that are not identical resolution type {mergedEntity.Type} {alternateEntity.Type}");
+                }
+                // doesn't matter which one we use, it's the same resolution.
+                mergedEntity.Resolution = entity.Resolution;
             }
 
             if (entity.Children != null)
