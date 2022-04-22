@@ -587,7 +587,7 @@ namespace Lucy
                             this.BuiltinEntities.Add("datetime");
 
                             // add default pattern for datetime = (all permutations of datetime)
-                            EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
+                            EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration|@datetimeV2.set)")));
                         }
 
                         if (builtinEntities.Contains(reference) ||

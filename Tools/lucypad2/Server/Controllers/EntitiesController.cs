@@ -34,7 +34,7 @@ namespace LucyPad2.Server.Controllers
             {
                 try
                 {
-                    engine = new LucyEngine(request.yaml, useAllBuiltIns: true);
+                    engine = new LucyEngine(request.yaml, useAllBuiltIns: false);
                     _cache.Set(request.yaml, engine);
                 }
                 catch (Exception err)

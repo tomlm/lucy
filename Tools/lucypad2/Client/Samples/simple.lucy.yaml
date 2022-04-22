@@ -8,7 +8,26 @@
 #   '~' ==> use fuzzy matching for the tokens in the group.
 # Entities can be placed into a pattern with '@', creating a compound entity result.
 locale: en
-externalEntities: []
+externalEntities: 
+  - age
+  - boolean
+  - currency
+  - datetime
+  - dimension
+  - email
+  - guid
+  - hashtag
+  - ip
+  - mention
+  - integer
+  - number
+  - numberrange
+  - ordinal
+  - percentage
+  - phonenumber
+  - temperature
+  - url
+  - quotedtext
 macros:
 entities:
   - name: '@name'

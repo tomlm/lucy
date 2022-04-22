@@ -1,6 +1,6 @@
 # sample for ordering drinks (beer, wine, whiskey, coffee)
 locale: en
-externalEntities: []
+externalEntities: [number, numberrange, ordinal]
 macros:
   $quantity: a|an|some|@number
   $beverages: "@beer|@wine|@whiskey|@coffee"

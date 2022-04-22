@@ -1,5 +1,5 @@
 locale: en
-externalEntities: []
+externalEntities: [dimension, integer, number, numberrange, ordinal, percentage]
 macros:
 entities:
   # captures @PizzaOrder and the entities it consumes 

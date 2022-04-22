@@ -222,7 +222,7 @@ namespace LucyPad2.Client
             if (lucyModel != yaml)
             {
                 // Trace.TraceInformation("Loading model");
-                engine = new LucyEngine(yaml, useAllBuiltIns: true);
+                engine = new LucyEngine(yaml, useAllBuiltIns: false);
                 this.lucyModel = yaml;
 
                 // this.examplesBox.Text = sb.ToString();
