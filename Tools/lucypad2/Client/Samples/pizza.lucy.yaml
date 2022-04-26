@@ -2,6 +2,12 @@ locale: en
 externalEntities: [dimension, integer, number, numberrange, ordinal, percentage]
 macros:
 entities:
+  - name: "@Order"
+    examples:
+      - I want a large cheese pizza with extra cheese and also a thick crust bbq with anchovies
+    patterns: 
+      - (@PizzaOrder) (___)* (@PizzaOrder)*
+
   # captures @PizzaOrder and the entities it consumes 
   - name: "@PizzaOrder"
     examples:

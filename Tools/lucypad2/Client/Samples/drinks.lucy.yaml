@@ -5,8 +5,13 @@ macros:
   $quantity: a|an|some|@number
   $beverages: "@beer|@wine|@whiskey|@coffee"
 entities:
-  # -------- DRINK ORDER
+  # -------- multi Drink Order
   - name: "@drinkOrder"
+    patterns:
+      - "@drink (___)* @drink)*"
+  
+  # -------- DRINK ORDER
+  - name: "@drink"
     patterns:
       - (@beer|@whiskey|@wine|@coffee|beverage|drink)
 
@@ -101,11 +106,6 @@ entities:
       - sugar
 
 
-  # ------------ MISC
-  - name: "@conjunction"
-    patterns:
-      - [or]
-      - [and, and also, also, with]
 
   # variations on words which will be captured as @container entitiy
   - name: "@container"

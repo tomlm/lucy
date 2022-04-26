@@ -615,7 +615,7 @@ namespace Lucy
             {
                 BuiltinEntities = new HashSet<string>(builtinEntities);
                 // add default pattern for datetime = (all permutations of datetime)
-                EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration)")));
+                EntityPatterns.Add(new EntityPattern("datetime", _patternParser.Parse("(@datetimeV2.date|@datetimeV2.time|@datetimeV2.datetime|@datetimeV2.daterange|@datetimeV2.timerange|@datetimeV2.datetimerange|@datetimeV2.duration|@datetimev2.set)")));
             }
 
             ValidateModel();
@@ -626,7 +626,7 @@ namespace Lucy
             HashSet<string> entityDefinitions = new HashSet<string>(builtinEntities)
             {
                 "datetime", "datetimeV2", "datetimeV2.date", "datetimeV2.time", "datetimeV2.datetime",
-                "datetimeV2.daterange", "datetimeV2.timerange", "datetimeV2.datetimerange",
+                "datetimeV2.set", "datetimeV2.daterange", "datetimeV2.timerange", "datetimeV2.datetimerange",
                 "datetimeV2.duration", "ordinal.relative", "wildcard"
             };
 
